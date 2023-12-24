@@ -140,14 +140,14 @@
                     (filter #(= :ride (:type %))
                             (:activities day-plan))))))
 
-(defn plan-title [plan]
+(defn plan-title [description]
   [:svg {:width diagram-width
          :height diagram-height
          :viewBox viewbox-dimensions-as-str}
    [:text {:x 0 :y 20
            :font-family "Fira Sans Condensed"
            :font-size ".5em"}
-    (:description plan)]])
+    description]])
 
 (defn plan-main-kilometers-svg [total-distance average-speed]
   (into [:svg {:width diagram-width
@@ -188,7 +188,7 @@
         average-speed (:average-speed plan)]
     (clerk/html
      [:g
-      (plan-title plan)
+      (plan-title (:description plan))
       (plan-main-kilometers-svg total-distance average-speed)
       (loop [i 0
              total-kilometers-covered 0
