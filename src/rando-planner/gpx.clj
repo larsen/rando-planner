@@ -2,17 +2,20 @@
   (:require [clojure.data.xml :as xml]
             [clojure.java.io :as io]))
 
+(defn gpx-data [gpx-file]
+  (xml/parse (io/input-stream gpx-file)))
+
 (defn points [gpx-file]
   (letfn [(pick-tag [tag data]
             (first
              (filter #(= tag (get % :tag)) data)))]
-    (let [gpx-data (xml/parse (io/input-stream gpx-file))
-          trkpts (->> gpx-data
-                      :content
-                      (pick-tag :trk)
-                      :content
-                      (pick-tag :trkseg)
-                      :content)]
+    (let [ trkpts (->> gpx-file
+                       gpx-data
+                       :content
+                       (pick-tag :trk)
+                       :content
+                       (pick-tag :trkseg)
+                       :content)]
       (map (fn [trkpt]
              (let [lat (-> trkpt :attrs :lat)
                    lon (-> trkpt :attrs :lon)
