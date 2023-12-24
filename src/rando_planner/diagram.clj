@@ -34,22 +34,25 @@
    :y (/ (* (- max-y y) (- viewbox-y viewbox-y0))
          (- max-y min-y))})
 
-(defn elevation-diagram [elevation from to vx0 vy0 vx vy]
-  (let [selected-elevation (filter (fn [{x :kilometer, y :elevation}]
+(defn elevation-diagram [{:keys [elevation from to viewbox]}]
+  (let [[min-x min-y width height] viewbox
+        selected-elevation (filter (fn [{x :kilometer}]
                                      (and (>= x from)
                                           (< x to)))
                                    elevation)
         min-elevation 0
         max-elevation (->> elevation
-                          (map :elevation)
-                          (apply max))
-        points-in-viewbox-space
-        (map (fn [{x :kilometer, y :elevation}]
-               (point-to-viewbox-space x y
-                                       from to
-                                       min-elevation max-elevation
-                                       vx0 vy0 vx vy))
-             selected-elevation)]
+                           (map :elevation)
+                           (apply max))
+        points-in-viewbox-space (map
+                                 (fn [{x :kilometer, y :elevation}]
+                                   (point-to-viewbox-space x y
+                                                           from to
+                                                           min-elevation
+                                                           max-elevation
+                                                           min-x min-y
+                                                           width height))
+                                     selected-elevation)]
     [:path {:stroke "orange"
             :stroke-width 1
             :fill "none"
@@ -131,7 +134,10 @@
                                                               average-speed))))))
                [:svg
                 [:g {:transform (str "translate(" main-offset ",0)")}
-                 (elevation-diagram elevation 0 400 0 0 150 25)]
+                 (elevation-diagram {:elevation elevation
+                                     :from 0
+                                     :to 400
+                                     :viewbox [0 0 150 25]})]
                 activities-diagram]))])))
 
 (defn kilometers-covered [day-plan average-speed]

@@ -1,7 +1,8 @@
 ^{:nextjournal.clerk/visibility {:code :hide}}
 (ns notebooks.venetogravel
   (:require [rando-planner.gpx :as gpx]
-            [rando-planner.diagram :as diagram]))
+            [rando-planner.diagram :as diagram]
+            [nextjournal.clerk :as clerk]))
 
 ;; # Venetogravel 2024
 
@@ -11,6 +12,17 @@
 ;; che consiste in un totale di circa 400 chilometri.
 
 (def gpx-resource "gpx/VG23-SHORT-LAKE-DEF.gpx")
+
+;; Il percorso non presenta sezioni particuolarmente
+;; impegnative quanto ad elevazione.
+
+(let [elevation (gpx/elevation gpx-resource)]
+  (clerk/html
+   [:svg {:width 600 :height 200}
+    (diagram/elevation-diagram {:elevation elevation
+                                :from 0
+                                :to 400
+                                :viewbox [0 0 600 200]})]))
 
 ;; Penso di poter mantenere una velocità media di 20 km/h lungo tutto
 ;; il percorso (con adeguato riposo).  Questa quantità dovrebbe essere
