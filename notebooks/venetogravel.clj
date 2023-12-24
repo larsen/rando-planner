@@ -10,8 +10,7 @@
 ;; Il percorso che sto considerando è lo Short Lake,
 ;; che consiste in un totale di circa 400 chilometri.
 
-(def gpx-file
-  "/home/stefano/dev/clojure/rando-planner/resources/gpx/VG23-SHORT-LAKE-DEF.gpx")
+(def gpx-resource "gpx/VG23-SHORT-LAKE-DEF.gpx")
 
 ;; Penso di poter mantenere una velocità media di 20 km/h lungo tutto
 ;; il percorso (con adeguato riposo).  Questa quantità dovrebbe essere
@@ -26,7 +25,7 @@
 
 ^{:nextjournal.clerk/visibility {:code :fold}}
 (defn total-time-required []
-  (/ (gpx/total-distance gpx-file)
+  (/ (gpx/total-distance gpx-resource)
      average-speed))
 
 (total-time-required)
@@ -35,7 +34,7 @@
 
 (def plan-start-19
   {:description "Starting on April 19th"
-   :gpx gpx-file
+   :gpx gpx-resource
    :average-speed average-speed
    :daily-plans [{:label "Day 1"
                   :activities [{:start "15:00" :length 6 :type :ride}]}
@@ -50,7 +49,7 @@
 
 (def plan-start-20
   {:description "Partenza il 20"
-   :gpx gpx-file
+   :gpx gpx-resource
    :average-speed average-speed
    :daily-plans [{:label "Giorno 1"
                   :activities [{:start "8:00" :length 8 :type :ride}]}
