@@ -24,15 +24,14 @@
           (map (fn [{x :x, y :y}]
                  (str " L" x "," y)) pts)))
 
-(defn point-to-viewbox-space [x y
-                              min-x max-x
-                              min-y max-y
-                              viewbox-x0 viewbox-y0
-                              viewbox-x viewbox-y]
-  {:x (/ (* (- max-x x) (- viewbox-x viewbox-x0))
-         (- max-x min-x))
-   :y (/ (* (- max-y y) (- viewbox-y viewbox-y0))
-         (- max-y min-y))})
+(defn point-to-viewbox-space [{:keys [x y pointspace viewbox]}]
+  (let [[pointspace-min-x pointspace-max-x
+         pointspace-min-y pointspace-max-y] pointspace
+        [min-x min-y width height] viewbox]
+    {:x (/ (* (- pointspace-max-x x) (- width min-x))
+           (- pointspace-max-x pointspace-min-x))
+     :y (/ (* (- pointspace-max-y y) (- height min-y))
+           (- pointspace-max-y pointspace-min-y))}))
 
 (defn elevation-diagram [{:keys [elevation from to viewbox]}]
   (let [[min-x min-y width height] viewbox
@@ -46,13 +45,14 @@
                            (apply max))
         points-in-viewbox-space (map
                                  (fn [{x :kilometer, y :elevation}]
-                                   (point-to-viewbox-space x y
-                                                           from to
-                                                           min-elevation
-                                                           max-elevation
-                                                           min-x min-y
-                                                           width height))
-                                     selected-elevation)]
+                                   (point-to-viewbox-space
+                                    {:x x :y y
+                                     :pointspace [from to
+                                                  min-elevation
+                                                  max-elevation]
+                                     :viewbox [min-x min-y
+                                               width height]}))
+                                 selected-elevation)]
     [:path {:stroke "orange"
             :stroke-width 1
             :fill "none"
