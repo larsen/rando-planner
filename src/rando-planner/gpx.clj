@@ -2,11 +2,11 @@
   (:require [clojure.data.xml :as xml]
             [clojure.java.io :as io]))
 
-(defn parse-gpx [file]
+(defn points [gpx-file]
   (letfn [(pick-tag [tag data]
             (first
              (filter #(= tag (get % :tag)) data)))]
-    (let [gpx-data (xml/parse (io/input-stream file))
+    (let [gpx-data (xml/parse (io/input-stream gpx-file))
           trkpts (->> gpx-data
                       :content
                       (pick-tag :trk)
@@ -25,14 +25,11 @@
 (defn haversine [point1 point2]
   (let [earth-radius 6371
         lat1 (Math/toRadians (:lat point1))
-                                        ;lon1 (Math/toRadians (:lon point1))
         lat2 (Math/toRadians (:lat point2))
-                                        ;lon2 (Math/toRadians (:lon point2))
         dlat (Math/toRadians (- (:lat point2)
                                 (:lat point1)))
         dlon (Math/toRadians (- (:lon point2)
                                 (:lon point1)))
-
         a (+ (Math/pow (Math/sin (/ dlat 2)) 2)
              (* (Math/pow (Math/sin (/ dlon 2)) 2)
                 (Math/cos lat1)
@@ -47,14 +44,11 @@
                 {:kilometer kilometer
                  :altitude (->> group
                                 (map :ele)
-                                (apply max)
-                                ;(apply +)
-                                ;(/ (count group))
-                                )}))
+                                (apply max))}))
          (sort-by :kilometer))))
 
-(defn process-gpx [file]
-  (let [points (parse-gpx file)
+(defn altitude [gpx-file]
+  (let [points (points gpx-file)
         points-with-distance
         (map-indexed (fn [idx point]
                        (if (zero? idx)
@@ -70,3 +64,10 @@
                      points-with-distance)
         grouped-by-kilometer (group-by-kilometer points-with-cumulative-distance)]
     grouped-by-kilometer))
+
+(defn total-distance [gpx-file]
+  (->> (points gpx-file)
+       (partition 2 1)
+       (map (fn [[point1 point2]]
+              (haversine point1 point2)))
+       (reduce +)))
