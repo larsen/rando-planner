@@ -34,22 +34,22 @@
    :y (/ (* (- max-y y) (- viewbox-y viewbox-y0))
          (- max-y min-y))})
 
-(defn altimetry-diagram [altimetry from to vx0 vy0 vx vy]
-  (let [selected-altimetry (filter (fn [{x :kilometer, y :altitude}]
+(defn elevation-diagram [elevation from to vx0 vy0 vx vy]
+  (let [selected-elevation (filter (fn [{x :kilometer, y :elevation}]
                                      (and (>= x from)
                                           (< x to)))
-                                   altimetry)
-        min-altitude 0
-        max-altitude (->> altimetry
-                          (map :altitude)
+                                   elevation)
+        min-elevation 0
+        max-elevation (->> elevation
+                          (map :elevation)
                           (apply max))
         points-in-viewbox-space
-        (map (fn [{x :kilometer, y :altitude}]
+        (map (fn [{x :kilometer, y :elevation}]
                (point-to-viewbox-space x y
                                        from to
-                                       min-altitude max-altitude
+                                       min-elevation max-elevation
                                        vx0 vy0 vx vy))
-             selected-altimetry)]
+             selected-elevation)]
     [:path {:stroke "orange"
             :stroke-width 1
             :fill "none"
@@ -94,7 +94,7 @@
                :text-anchor "middle"}
         (str (+ kilometers (* average-speed (+ 1 n))))]])))
 
-(defn day-plan->svg [day-plan km average-speed altitude]
+(defn day-plan->svg [day-plan km average-speed elevation]
   (let [main-offset (* (/ km average-speed) box-size)]
     (into [:svg {:width diagram-width
                  :height diagram-height
@@ -131,7 +131,7 @@
                                                               average-speed))))))
                [:svg
                 [:g {:transform (str "translate(" main-offset ",0)")}
-                 (altimetry-diagram altitude 0 400 0 0 150 25)]
+                 (elevation-diagram elevation 0 400 0 0 150 25)]
                 activities-diagram]))])))
 
 (defn kilometers-covered [day-plan average-speed]
@@ -184,7 +184,7 @@
 
 (defn plan->diagram [plan]
   (let [total-distance (gpx/total-distance (:gpx plan))
-        altitude (gpx/altitude (:gpx plan))
+        elevation (gpx/elevation (:gpx plan))
         average-speed (:average-speed plan)]
     (clerk/html
      [:g
@@ -201,5 +201,5 @@
                  (conj output (day-plan->svg (nth (:daily-plans plan) i)
                                              total-kilometers-covered
                                              average-speed
-                                             altitude)))
+                                             elevation)))
           output))])))

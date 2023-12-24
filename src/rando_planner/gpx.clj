@@ -46,12 +46,12 @@
     (->> groups
          (map (fn [[kilometer group]]
                 {:kilometer kilometer
-                 :altitude (->> group
+                 :elevation (->> group
                                 (map :ele)
                                 (apply max))}))
          (sort-by :kilometer))))
 
-(defn altitude [gpx-file]
+(defn elevation [gpx-file]
   (let [points (points gpx-file)
         points-with-distance
         (map-indexed (fn [idx point]
