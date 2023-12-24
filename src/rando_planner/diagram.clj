@@ -34,8 +34,7 @@
            (- pointspace-max-y pointspace-min-y))}))
 
 (defn elevation-diagram [{:keys [elevation from to viewbox]}]
-  (let [[min-x min-y width height] viewbox
-        selected-elevation (filter (fn [{x :kilometer}]
+  (let [selected-elevation (filter (fn [{x :kilometer}]
                                      (and (>= x from)
                                           (< x to)))
                                    elevation)
@@ -50,8 +49,7 @@
                                      :pointspace [from to
                                                   min-elevation
                                                   max-elevation]
-                                     :viewbox [min-x min-y
-                                               width height]}))
+                                     :viewbox viewbox}))
                                  selected-elevation)]
     [:path {:stroke "orange"
             :stroke-width 1
