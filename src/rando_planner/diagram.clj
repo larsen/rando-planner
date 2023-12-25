@@ -24,7 +24,7 @@
           (map (fn [{x :x, y :y}]
                  (str " L" x "," y)) pts)))
 
-(defn point-to-viewbox-space [{:keys [x y pointspace viewbox]}]
+(defn pointspace-to-viewbox-space [{:keys [x y pointspace viewbox]}]
   (let [[pointspace-min-x pointspace-max-x
          pointspace-min-y pointspace-max-y] pointspace
         [min-x min-y width height] viewbox]
@@ -44,7 +44,7 @@
                            (apply max))
         points-in-viewbox-space (map
                                  (fn [{x :kilometer, y :elevation}]
-                                   (point-to-viewbox-space
+                                   (pointspace-to-viewbox-space
                                     {:x x :y y
                                      :pointspace [from to
                                                   min-elevation
@@ -59,7 +59,7 @@
 (def box-size 10)
 (def left-margin 50)
 (def diagram-width 600)
-(def diagram-height 70)
+(def diagram-height 500)
 (def viewbox-dimensions [0 0 diagram-width diagram-height])
 (def viewbox-dimensions-as-str
   (viewbox-dimensions-to-str viewbox-dimensions))
@@ -97,14 +97,17 @@
 
 (defn day-plan->svg [day-plan km average-speed elevation]
   (let [main-offset (* (/ km average-speed) box-size)]
-    (into [:svg {:width diagram-width
-                 :height diagram-height
-                 :viewBox viewbox-dimensions-as-str}
+    (into [:svg
            [:text {:x 0 :y 15
                    :font-family "Fira Sans Condensed"
                    :font-size ".35em"
                    :dominant-baseline "middle"}
             (:label day-plan)]
+           [:g {:transform (str "translate(" main-offset " 0)")}
+                 (elevation-diagram {:elevation elevation
+                                     :from 0
+                                     :to 400
+                                     :viewbox [0 0 100 20]})]
            (loop [i 0
                   kilometers km
                   elapsed-hours 0
@@ -130,12 +133,7 @@
                                                               offset
                                                               kilometers
                                                               average-speed))))))
-               [:svg
-                [:g {:transform (str "translate(" main-offset ",0)")}
-                 (elevation-diagram {:elevation elevation
-                                     :from 0
-                                     :to 400
-                                     :viewbox [0 0 150 25]})]
+               [:g {:transform "translate(0 28)"}
                 activities-diagram]))])))
 
 (defn kilometers-covered [day-plan average-speed]
@@ -145,18 +143,20 @@
                             (:activities day-plan))))))
 
 (defn plan-title [description]
-  [:svg {:width diagram-width
-         :height diagram-height
-         :viewBox viewbox-dimensions-as-str}
-   [:text {:x 0 :y 20
+  [:svg {; :width diagram-width
+         ;; Is there a better way?
+         ;; This height specified here is second-guessing
+         ;; the size of the inner text element
+         ;:height 25
+         }
+   [:text {:x 0 :y 20                  ; guessing the baseline position
            :font-family "Fira Sans Condensed"
            :font-size ".5em"}
     description]])
 
-(defn plan-main-kilometers-svg [total-distance average-speed]
-  (into [:svg {:width diagram-width
-               :height diagram-height
-               :viewBox viewbox-dimensions-as-str}]
+(defn plan-main-kilometers-svg [total-distance average-speed elevation]
+  (into [:svg ;{:width diagram-width :height 80}
+         ]
         [:g
          (loop [i 0
                 output [:g]]
@@ -190,20 +190,27 @@
   (let [total-distance (gpx/total-distance (:gpx plan))
         elevation (gpx/elevation (:gpx plan))
         average-speed (:average-speed plan)]
-    (clerk/html
-     [:g
-      (plan-title (:description plan))
-      (plan-main-kilometers-svg total-distance average-speed)
-      (loop [i 0
-             total-kilometers-covered 0
-             output [:g]]
-        (if (< i (count (:daily-plans plan)))
-          (recur (inc i)
-                 (+ total-kilometers-covered
-                    (kilometers-covered (nth (:daily-plans plan) i)
-                                        average-speed))
-                 (conj output (day-plan->svg (nth (:daily-plans plan) i)
+    [:svg {:width diagram-width
+           :height diagram-height
+           :viewBox "0 0 300 250"}
+     (plan-title (:description plan))
+     [:g {:transform "translate(0 25)"}
+      (plan-main-kilometers-svg total-distance
+                                average-speed
+                                elevation)]
+     (loop [i 0
+            total-kilometers-covered 0
+            output [:g]]
+       (if (< i (count (:daily-plans plan)))
+         (recur (inc i)
+                (+ total-kilometers-covered
+                   (kilometers-covered (nth (:daily-plans plan) i)
+                                       average-speed))
+                (conj output [:g {:transform (str "translate(0 "
+                                                  (+ 50
+                                                     (* i 60)) ")")}
+                              (day-plan->svg (nth (:daily-plans plan) i)
                                              total-kilometers-covered
                                              average-speed
-                                             elevation)))
-          output))])))
+                                             elevation)]))
+         output))]))

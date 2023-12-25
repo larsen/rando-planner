@@ -56,7 +56,8 @@
                  {:label "Day 3"
                   :activities [{:start "08:00" :length 6 :type :ride}]}]})
 
-(diagram/plan->diagram plan-start-19)
+(clerk/html
+ (diagram/plan->diagram plan-start-19))
 
 
 (def plan-start-20
@@ -71,4 +72,5 @@
                  {:label "Giorno 3"
                   :activities [{:start "09:00" :length 6 :type :ride}]}]})
 
-(diagram/plan->diagram plan-start-20)
+(clerk/html
+ (diagram/plan->diagram plan-start-20))
