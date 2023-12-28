@@ -59,7 +59,7 @@
 (def box-size 10)
 (def left-margin 50)
 (def diagram-width 600)
-(def diagram-height 500)
+(def diagram-height 450)
 (def viewbox-dimensions [0 0 diagram-width diagram-height])
 (def viewbox-dimensions-as-str
   (viewbox-dimensions-to-str viewbox-dimensions))
@@ -95,19 +95,34 @@
                :text-anchor "middle"}
         (str (+ kilometers (* average-speed (+ 1 n))))]])))
 
+(defn kilometers-in-a-day [day-plan average-speed]
+  (reduce + (map #(* (:length %) average-speed)
+                 (filter #(= (:type %) :ride)
+                         (:activities day-plan)))))
+
 (defn day-plan->svg [day-plan km average-speed elevation]
-  (let [main-offset (* (/ km average-speed) box-size)]
+  (let [main-offset (* (/ km average-speed) box-size)
+        total-km-for-day (kilometers-in-a-day day-plan
+                                              average-speed)]
     (into [:svg
            [:text {:x 0 :y 15
                    :font-family "Fira Sans Condensed"
                    :font-size ".35em"
                    :dominant-baseline "middle"}
             (:label day-plan)]
-           [:g {:transform (str "translate(" main-offset " 0)")}
-                 (elevation-diagram {:elevation elevation
-                                     :from 0
-                                     :to 400
-                                     :viewbox [0 0 100 20]})]
+           [:text {:x 0 :y 22
+                   :font-family "Fira Sans"
+                   :font-size ".28em"
+                   :dominant-baseline "middle"}
+            (str "~" total-km-for-day " km")]
+           [:g {:transform (str "translate(" (+ left-margin
+                                                main-offset) " 0)")}
+            (elevation-diagram {:elevation elevation
+                                :from km
+                                :to (+ km total-km-for-day)
+                                :viewbox [0 0 (* box-size
+                                                 (/ total-km-for-day
+                                                    average-speed)) 20]})]
            (loop [i 0
                   kilometers km
                   elapsed-hours 0
@@ -133,7 +148,7 @@
                                                               offset
                                                               kilometers
                                                               average-speed))))))
-               [:g {:transform "translate(0 28)"}
+               [:g {:transform "translate(0 20)"}
                 activities-diagram]))])))
 
 (defn kilometers-covered [day-plan average-speed]
@@ -192,7 +207,7 @@
         average-speed (:average-speed plan)]
     [:svg {:width diagram-width
            :height diagram-height
-           :viewBox "0 0 300 250"}
+           :viewBox "0 0 300 230"}
      (plan-title (:description plan))
      [:g {:transform "translate(0 25)"}
       (plan-main-kilometers-svg total-distance
@@ -208,7 +223,7 @@
                                        average-speed))
                 (conj output [:g {:transform (str "translate(0 "
                                                   (+ 50
-                                                     (* i 60)) ")")}
+                                                     (* i 50)) ")")}
                               (day-plan->svg (nth (:daily-plans plan) i)
                                              total-kilometers-covered
                                              average-speed

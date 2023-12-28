@@ -70,7 +70,7 @@
                   :activities [{:start "07:00" :length 5 :type :ride}
                                {:start "17:00" :length 3 :type :ride}]}
                  {:label "Giorno 3"
-                  :activities [{:start "09:00" :length 6 :type :ride}]}]})
+                  :activities [{:start "09:00" :length 4 :type :ride}]}]})
 
 (clerk/html
  (diagram/plan->diagram plan-start-20))
