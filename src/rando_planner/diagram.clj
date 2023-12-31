@@ -28,10 +28,18 @@
   (let [[pointspace-min-x pointspace-max-x
          pointspace-min-y pointspace-max-y] pointspace
         [min-x min-y width height] viewbox]
-    {:x (/ (* (- pointspace-max-x x) (- width min-x))
+    {:x (/ (* (Math/abs (- pointspace-min-x x)) (- width min-x))
            (- pointspace-max-x pointspace-min-x))
      :y (/ (* (- pointspace-max-y y) (- height min-y))
            (- pointspace-max-y pointspace-min-y))}))
+
+(defn points-in-viewbox-space [elevation pointspace viewbox]
+  (map (fn [{x :kilometer, y :elevation}]
+         (pointspace-to-viewbox-space
+          {:x x :y y
+           :pointspace pointspace
+           :viewbox viewbox}))
+       elevation))
 
 (defn elevation-diagram [{:keys [elevation from to viewbox]}]
   (let [selected-elevation (filter (fn [{x :kilometer}]
@@ -42,19 +50,15 @@
         max-elevation (->> elevation
                            (map :elevation)
                            (apply max))
-        points-in-viewbox-space (map
-                                 (fn [{x :kilometer, y :elevation}]
-                                   (pointspace-to-viewbox-space
-                                    {:x x :y y
-                                     :pointspace [from to
-                                                  min-elevation
-                                                  max-elevation]
-                                     :viewbox viewbox}))
-                                 selected-elevation)]
+        points (points-in-viewbox-space selected-elevation
+                                        [from to
+                                         min-elevation
+                                         max-elevation]
+                                        viewbox)]
     [:path {:stroke "orange"
             :stroke-width 1
             :fill "none"
-            :d (points->path points-in-viewbox-space)}]))
+            :d (points->path points)}]))
 
 (def box-size 10)
 (def left-margin 50)
