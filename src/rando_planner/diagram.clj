@@ -162,20 +162,14 @@
                             (:activities day-plan))))))
 
 (defn plan-title [description]
-  [:svg {; :width diagram-width
-         ;; Is there a better way?
-         ;; This height specified here is second-guessing
-         ;; the size of the inner text element
-         ;:height 25
-         }
+  [:svg
    [:text {:x 0 :y 20                  ; guessing the baseline position
            :font-family "Fira Sans Condensed"
            :font-size ".5em"}
     description]])
 
 (defn plan-main-kilometers-svg [total-distance average-speed elevation]
-  (into [:svg ;{:width diagram-width :height 80}
-         ]
+  (into [:svg]
         [:g
          (loop [i 0
                 output [:g]]
