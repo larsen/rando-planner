@@ -3,7 +3,8 @@
             [clj-time.core :as t]
             [clj-time.format :as f]
             [nextjournal.clerk :as clerk]
-            [rando-planner.gpx :as gpx]))
+            [rando-planner.gpx :as gpx]
+            [rando-planner.plan :as plan]))
 
 (defn string-to-time [time-str]
   (let [formatter (f/formatter "HH:mm")]
@@ -99,14 +100,9 @@
                :text-anchor "middle"}
         (str (+ kilometers (* average-speed (+ 1 n))))]])))
 
-(defn kilometers-in-a-day [day-plan average-speed]
-  (reduce + (map #(* (:length %) average-speed)
-                 (filter #(= (:type %) :ride)
-                         (:activities day-plan)))))
-
 (defn day-plan->svg [day-plan km average-speed elevation]
   (let [main-offset (* (/ km average-speed) box-size)
-        total-km-for-day (kilometers-in-a-day day-plan
+        total-km-for-day (plan/kilometers-in-a-day day-plan
                                               average-speed)]
     (into [:svg
            [:text {:x 0 :y 15
@@ -154,12 +150,6 @@
                                                               average-speed))))))
                [:g {:transform "translate(0 20)"}
                 activities-diagram]))])))
-
-(defn kilometers-covered [day-plan average-speed]
-  (* average-speed
-     (reduce + (map :length
-                    (filter #(= :ride (:type %))
-                            (:activities day-plan))))))
 
 (defn plan-title [description]
   [:svg
@@ -217,8 +207,8 @@
        (if (< i (count (:daily-plans plan)))
          (recur (inc i)
                 (+ total-kilometers-covered
-                   (kilometers-covered (nth (:daily-plans plan) i)
-                                       average-speed))
+                   (plan/kilometers-covered (nth (:daily-plans plan) i)
+                                            average-speed))
                 (conj output [:g {:transform (str "translate(0 "
                                                   (+ 50
                                                      (* i 50)) ")")}
