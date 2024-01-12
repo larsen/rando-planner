@@ -1,18 +1,8 @@
 (ns rando-planner.diagram
   (:require [clojure.string :as str]
-            [clj-time.core :as t]
-            [clj-time.format :as f]
             [nextjournal.clerk :as clerk]
             [rando-planner.gpx :as gpx]
             [rando-planner.plan :as plan]))
-
-(defn string-to-time [time-str]
-  (let [formatter (f/formatter "HH:mm")]
-    (f/parse formatter time-str)))
-
-(defn time-to-string [dt]
-  (let [formatter (f/formatter "HH:mm")]
-    (f/unparse formatter dt)))
 
 (defn viewbox-dimensions-to-str [viewbox-dimensions]
   (str/join " " (map str viewbox-dimensions)))
@@ -86,8 +76,8 @@
                :font-family "Fira Sans"
                :font-size ".2em"
                :text-anchor "middle"}
-        (time-to-string (t/plus (string-to-time (:start activity))
-                                (t/hours (+ 1 n))))]
+        (plan/time-after-n-hours (:start activity) (+ 1 n))
+]
        [:rect {:x (+ margin (* n box-size))
                :y box-size
                :width box-size :height box-size
