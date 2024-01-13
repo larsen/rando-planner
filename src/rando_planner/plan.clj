@@ -36,7 +36,7 @@
               pause-length (t/interval pause-start
                                        (string-to-time (:start (first next-activities))))]
           (recur (conj p {:start pause-start-as-str
-                          :lenght (t/in-hours pause-length)})
+                          :length (t/in-hours pause-length)})
                  (first next-activities)
                  (rest next-activities)))
         p))))
