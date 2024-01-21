@@ -32,6 +32,14 @@
            :viewbox viewbox}))
        elevation))
 
+(def box-size 10)
+(def left-margin 50)
+(def diagram-width 600)
+(def diagram-height 450)
+(def viewbox-dimensions [0 0 diagram-width diagram-height])
+(def viewbox-dimensions-as-str
+  (viewbox-dimensions-to-str viewbox-dimensions))
+
 (defn elevation-diagram [{:keys [elevation from to viewbox]}]
   (let [selected-elevation (filter (fn [{x :kilometer}]
                                      (and (>= x from)
@@ -51,13 +59,30 @@
             :fill "none"
             :d (points->path points)}]))
 
-(def box-size 10)
-(def left-margin 50)
-(def diagram-width 600)
-(def diagram-height 450)
-(def viewbox-dimensions [0 0 diagram-width diagram-height])
-(def viewbox-dimensions-as-str
-  (viewbox-dimensions-to-str viewbox-dimensions))
+(defn pauses-diagram [{:keys [pauses]}]
+  (loop [i 0
+         pauses-diagram [:g]]
+    (if (< i (count pauses))
+      (let [p (nth pauses i)]
+        (recur (inc i)
+               (conj pauses-diagram
+                     (let [position-x (+ left-margin
+                                         (* (:after (nth pauses i)) box-size))]
+                       [:g
+                        [:polygon {
+                                   :points (str/join \space
+                                                     (map #(str/join \, %)
+                                                          [[position-x 0]
+                                                           [(- position-x 2) -2]
+                                                           [(+ position-x 2) -2]]))}]
+                        [:text {:x position-x
+                                :y -3
+                                :font-family "Fira Sans"
+                                :font-size ".25em"
+                                :text-anchor "middle"}
+                         (str (:length (nth pauses i)))]]))))
+      [:g {:transform "translate(0 29)"}
+       pauses-diagram])))
 
 (defn single-activity-streak [activity
                               offset-of-previous-activities
@@ -76,8 +101,7 @@
                :font-family "Fira Sans"
                :font-size ".2em"
                :text-anchor "middle"}
-        (plan/time-after-n-hours (:start activity) (+ 1 n))
-]
+        (plan/time-after-n-hours (:start activity) (+ 1 n))]
        [:rect {:x (+ margin (* n box-size))
                :y box-size
                :width box-size :height box-size
@@ -91,9 +115,10 @@
         (str (+ kilometers (* average-speed (+ 1 n))))]])))
 
 (defn day-plan->svg [day-plan km average-speed elevation]
-  (let [main-offset (* (/ km average-speed) box-size)
+  (let [pauses (plan/pauses day-plan)
+        main-offset (* (/ km average-speed) box-size)
         total-km-for-day (plan/kilometers-in-a-day day-plan
-                                              average-speed)]
+                                                   average-speed)]
     (into [:svg
            [:text {:x 0 :y 15
                    :font-family "Fira Sans Condensed"
@@ -113,6 +138,7 @@
                                 :viewbox [0 0 (* box-size
                                                  (/ total-km-for-day
                                                     average-speed)) 20]})]
+           (pauses-diagram {:pauses pauses})
            (loop [i 0
                   kilometers km
                   elapsed-hours 0

@@ -24,8 +24,14 @@
                     (filter #(= :ride (:type %))
                             (:activities day-plan))))))
 
-(defn pauses [day-plan]
-  (let [activities (:activities day-plan)]
+(defn pauses
+  "Given a day plan it returns a vector of pauses objects,
+  each one characterized by its LENGTH (in hours),
+  when it starts (as a string representing a time of the day),
+  and how many hours after the start of the day the pause occurs."
+  [day-plan]
+  (let [activities (:activities day-plan)
+        plan-starts-at (string-to-time (:start (first activities)))]
     (loop [p []
            curr-activity (first activities)
            next-activities (rest activities)]
@@ -36,6 +42,11 @@
               pause-length (t/interval pause-start
                                        (string-to-time (:start (first next-activities))))]
           (recur (conj p {:start pause-start-as-str
+                          :after (t/in-hours (t/interval plan-starts-at
+                                                         pause-start))
+                          ;; TODO
+                          ;; it should manage pauses that last
+                          ;; a fractional number of hours
                           :length (t/in-hours pause-length)})
                  (first next-activities)
                  (rest next-activities)))
