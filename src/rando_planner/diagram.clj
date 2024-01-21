@@ -66,8 +66,7 @@
       (let [p (nth pauses i)]
         (recur (inc i)
                (conj pauses-diagram
-                     (let [position-x (+ left-margin
-                                         (* (:after (nth pauses i)) box-size))]
+                     (let [position-x (* (:after (nth pauses i)) box-size)]
                        [:g
                         [:polygon {
                                    :points (str/join \space
@@ -81,8 +80,7 @@
                                 :font-size ".25em"
                                 :text-anchor "middle"}
                          (str (:length (nth pauses i)))]]))))
-      [:g {:transform "translate(0 29)"}
-       pauses-diagram])))
+      pauses-diagram)))
 
 (defn single-activity-streak [activity
                               offset-of-previous-activities
@@ -138,7 +136,9 @@
                                 :viewbox [0 0 (* box-size
                                                  (/ total-km-for-day
                                                     average-speed)) 20]})]
-           (pauses-diagram {:pauses pauses})
+           [:g {:transform (str "translate(" (+ left-margin
+                                                main-offset) " 29)")}
+            (pauses-diagram {:pauses pauses})]
            (loop [i 0
                   kilometers km
                   elapsed-hours 0
