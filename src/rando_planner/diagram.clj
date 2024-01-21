@@ -66,14 +66,14 @@
       (let [p (nth pauses i)]
         (recur (inc i)
                (conj pauses-diagram
-                     (let [position-x (* (:after (nth pauses i)) box-size)]
+                     (let [position-x (* (:after (nth pauses i)) box-size)
+                           triangle-vertexes [[position-x 0]
+                                              [(- position-x 2) -2]
+                                              [(+ position-x 2) -2]]]
                        [:g
-                        [:polygon {
-                                   :points (str/join \space
-                                                     (map #(str/join \, %)
-                                                          [[position-x 0]
-                                                           [(- position-x 2) -2]
-                                                           [(+ position-x 2) -2]]))}]
+                        [:polygon {:points (->> triangle-vertexes
+                                                (map (partial str/join \,))
+                                                (str/join \space))}]
                         [:text {:x position-x
                                 :y -3
                                 :font-family "Fira Sans"
