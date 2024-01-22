@@ -71,15 +71,18 @@
                                               [(- position-x 2) -2]
                                               [(+ position-x 2) -2]]]
                        [:g
-                        [:polygon {:points (->> triangle-vertexes
+                        [:polygon {:style {:fill "green"}
+                                   :points (->> triangle-vertexes
                                                 (map (partial str/join \,))
                                                 (str/join \space))}]
                         [:text {:x position-x
                                 :y -3
                                 :font-family "Fira Sans"
-                                :font-size ".25em"
+                                :font-size ".20em"
+                                :fill "darkgreen"
                                 :text-anchor "middle"}
-                         (str (:length (nth pauses i)))]]))))
+                         (str (:length (nth pauses i))
+                              " hour(s)")]]))))
       pauses-diagram)))
 
 (defn single-activity-streak [activity
