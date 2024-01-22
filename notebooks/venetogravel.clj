@@ -2,6 +2,7 @@
 (ns notebooks.venetogravel
   (:require [rando-planner.gpx :as gpx]
             [rando-planner.diagram :as diagram]
+            [rando-planner.leaflet :as leaflet]
             [nextjournal.clerk :as clerk]))
 
 ;; # Venetogravel 2024
@@ -11,7 +12,13 @@
 ;; Il percorso che sto considerando è lo Short Lake,
 ;; che consiste in un totale di circa 400 chilometri.
 
-(def gpx-resource "gpx/VG23-SHORT-LAKE-DEF.gpx")
+(clerk/with-viewer leaflet/leaflet-gpx-viewer
+  {:gpx "https://stefanorodighiero.net/misc/VG-2024_400k_lake_provvis.gpx"
+   :center [45.478431 11.439041]
+   :zoom 9})
+
+
+(def gpx-resource "gpx/VG-2024_400k_lake_provvis.gpx")
 
 ;; Il percorso non presenta sezioni particuolarmente
 ;; impegnative quanto ad elevazione.
