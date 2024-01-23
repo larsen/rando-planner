@@ -232,8 +232,8 @@
        (if (< i (count (:daily-plans plan)))
          (recur (inc i)
                 (+ total-kilometers-covered
-                   (plan/kilometers-covered (nth (:daily-plans plan) i)
-                                            average-speed))
+                   (plan/kilometers-in-a-day (nth (:daily-plans plan) i)
+                                             average-speed))
                 (conj output [:g {:transform (str "translate(0 "
                                                   (+ 50
                                                      (* i 50)) ")")}

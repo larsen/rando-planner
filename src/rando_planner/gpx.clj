@@ -75,3 +75,9 @@
        (map (fn [[point1 point2]]
               (haversine point1 point2)))
        (reduce +)))
+
+(defn partition-according-to-plan
+  "Given a GPX-FILE (a file resource name) and a plan, it returns
+  an array of GPX content strings, representing the original GPX divided into chunks"
+  [gpx-file plan]
+  )
