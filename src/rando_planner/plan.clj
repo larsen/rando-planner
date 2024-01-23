@@ -45,3 +45,22 @@
                  (first next-activities)
                  (rest next-activities)))
         p))))
+
+(defn daily-kilometers
+  "Given a plan, it returns a vector of structures containing how many
+  kilometers are done in each day, and from what kilometer each day starts"
+  [plan]
+  (let [daily-plans (:daily-plans plan)]
+    (loop [result []
+           acc-km 0
+           i 0]
+      (if (< i (count daily-plans))
+        (let [km (kilometers-in-a-day (nth daily-plans i)
+                                      (:average-speed plan))]
+          (recur (conj result
+                       {:day (+ 1 i)
+                        :kilometers km
+                        :covered acc-km})
+                 (+ acc-km km)
+                 (inc i)))
+        result))))
