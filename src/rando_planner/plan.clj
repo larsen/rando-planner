@@ -18,12 +18,6 @@
                  (filter #(= (:type %) :ride)
                          (:activities day-plan)))))
 
-(defn kilometers-covered [day-plan average-speed]
-  (* average-speed
-     (reduce + (map :length
-                    (filter #(= :ride (:type %))
-                            (:activities day-plan))))))
-
 (defn pauses
   "Given a day plan it returns a vector of pauses objects,
   each one characterized by its LENGTH (in hours),
@@ -51,5 +45,3 @@
                  (first next-activities)
                  (rest next-activities)))
         p))))
-
-
