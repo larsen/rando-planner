@@ -7,8 +7,7 @@
                  (when value
                    [nextjournal.clerk.render/with-d3-require
                     {:package ["leaflet@1.7.1/dist/leaflet.min.js"
-                               "leaflet-gpx@1.5.1/gpx.min.js"
-                               ]}
+                               "leaflet-gpx@1.5.1/gpx.min.js"]}
                     (fn [leaflet]
                       [:div {:id "lmap"
                              :height "400px"
@@ -22,7 +21,8 @@
                                             m (.map js/L "lmap")
                                             tile-layer (.tileLayer js/L "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
                                                                    (clj->js {:attribution attribution}))
-                                            gpx-layer (new js/L.GPX (:gpx value)
+                                            gpx-layer (new js/L.GPX (or (:gpx value)
+                                                                        (:gpx-content value))
                                                            (clj->js {:async true
                                                                      :marker_options marker-options}))]
                                         (.setView m
