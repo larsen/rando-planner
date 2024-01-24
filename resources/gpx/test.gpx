@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="Run.GPS Community Server" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaLocation="http://www.topografix.com/GPX/1/1/gpx.xsd" xmlns="http://www.topografix.com/GPX/1/1">
+  <metadata>
+    <name>VG23-short_LAKE-def</name>
+    <author>Roberto_mtb</author>
+    <link href="https://www.rungps.net">
+      <text>Run.GPS by eSymetric GmbH</text>
+    </link>
+  </metadata>
+  <trk>
+    <name>VG23-short_LAKE-def</name>
+    <desc></desc>
+    <extensions>
+        <sport>mountainbiking</sport>
+        <type> </type>
+        <trackQuality>3</trackQuality>
+        <isPublic>false</isPublic>
+        <ascent>2954.91</ascent>
+        <descent>2965.91</descent>
+        <maxLat>-1000.0</maxLat>
+        <minLat>1000.0</minLat>
+        <maxLng>-1000.0</maxLng>
+        <minLng>1000.0</minLng>
+    </extensions>
+    <trkseg>
+        <trkpt lon="11.731275" lat="45.765875">  <ele>117.0</ele>
+</trkpt>
+<trkpt lon="11.731155" lat="45.765557">  <ele>118.0</ele>
+</trkpt>
+<trkpt lon="11.731128" lat="45.765322">  <ele>118.0</ele>
+</trkpt>
+<trkpt lon="11.731074" lat="45.764854">  <ele>118.0</ele>
+</trkpt>
+<trkpt lon="11.731075" lat="45.764723">  <ele>116.0</ele>
+</trkpt>
+    </trkseg>
+  </trk>
+</gpx>
