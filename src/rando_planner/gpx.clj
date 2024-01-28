@@ -1,22 +1,18 @@
 (ns rando-planner.gpx
-  (:require [clojure.data.xml :as xml]
-            [clojure.java.io :as io]))
-
-(defn gpx-data [gpx-resource]
-  (xml/parse (io/input-stream
-              (io/resource gpx-resource))))
+  (:require [rando-planner.xml :as xml]
+            [rando-planner.plan :as plan]))
 
 (defn points [gpx-resource]
   (letfn [(pick-tag [tag data]
-            (first
-             (filter #(= tag (get % :tag)) data)))]
-    (let [ trkpts (->> gpx-resource
-                       gpx-data
-                       :content
-                       (pick-tag :trk)
-                       :content
-                       (pick-tag :trkseg)
-                       :content)]
+            (->> data
+                 (sequence (xml/tag= tag))
+                 first
+                 :content))]
+    (let [trkpts (->> gpx-resource
+                      xml/xml-data
+                      :content
+                      (pick-tag :trk)
+                      (pick-tag :trkseg))]
       (map (fn [trkpt]
              (let [lat (-> trkpt :attrs :lat)
                    lon (-> trkpt :attrs :lon)
@@ -51,8 +47,8 @@
                                 (apply max))}))
          (sort-by :kilometer))))
 
-(defn elevation [gpx-file]
-  (let [points (points gpx-file)
+(defn elevation [gpx-resource]
+  (let [points (points gpx-resource)
         points-with-distance
         (map-indexed (fn [idx point]
                        (if (zero? idx)
@@ -69,8 +65,8 @@
         grouped-by-kilometer (group-by-kilometer points-with-cumulative-distance)]
     grouped-by-kilometer))
 
-(defn total-distance [gpx-file]
-  (->> (points gpx-file)
+(defn total-distance [gpx-resource]
+  (->> (points gpx-resource)
        (partition 2 1)
        (map (fn [[point1 point2]]
               (haversine point1 point2)))
@@ -80,4 +76,5 @@
   "Given a GPX-FILE (a file resource name) and a plan, it returns
   an array of GPX content strings, representing the original GPX divided into chunks"
   [gpx-file plan]
-  )
+  (let [daily-kilometers (plan/daily-kilometers plan)]
+    ))

@@ -13,7 +13,7 @@
 
 (clerk/serve! {:watch-paths ["notebooks" "src"]})
 
-;; ;; start with watcher and show filter function to enable notebook pinning
+;; start with watcher and show filter function to enable notebook pinning
 ;; (clerk/serve! {:watch-paths ["notebooks" "src"] :show-filter-fn #(clojure.string/starts-with? % "notebooks")})
 
 ;(clerk/build! {:paths ["notebooks/ber_ko.clj"]})
