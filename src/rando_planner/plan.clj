@@ -1,6 +1,7 @@
 (ns rando-planner.plan
   (:require [clj-time.core :as t]
-            [clj-time.format :as f]))
+            [clj-time.format :as f]
+            [rando-planner.gpx :as gpx]))
 
 (defn string-to-time [time-str]
   (let [formatter (f/formatter "HH:mm")]
@@ -64,3 +65,11 @@
                  (+ acc-km km)
                  (inc i)))
         result))))
+
+(defn points-at-daily-kilometers [gpx-resource plan]
+  (let [points-wcd (gpx/points-with-cumulative-distance (gpx/points gpx-resource))]
+    (for [dk (rest (daily-kilometers plan))]
+      (first (filter (fn [p]
+                       (> (:cumulative-distance p)
+                          (:covered dk)))
+                     points-wcd)))))

@@ -37,33 +37,38 @@
         c (* 2 (Math/asin (Math/sqrt a)))]
     (* c earth-radius)))
 
-(defn group-by-kilometer [points]
-  (let [groups (group-by #(->> % :cumulative-distance (Math/floor)) points)]
+(defn points-with-distance [points]
+  (map-indexed (fn [idx point]
+                 (if (zero? idx)
+                   (assoc point :distance 0)
+                   (assoc point :distance (haversine
+                                           (nth points (dec idx)) point))))
+               points))
+
+(defn points-with-cumulative-distance [points]
+  (let [points-with-distance (points-with-distance points)]
+    (map-indexed (fn [idx point]
+                   (assoc point :cumulative-distance
+                          (reduce + (map :distance
+                                         (take idx points-with-distance)))))
+                 points-with-distance)))
+
+(defn group-by-kilometer [points-with-cumulative-distance]
+  (let [groups (group-by #(->> % :cumulative-distance (Math/floor))
+                         points-with-cumulative-distance)]
     (->> groups
          (map (fn [[kilometer group]]
                 {:kilometer kilometer
                  :elevation (->> group
-                                (map :ele)
-                                (apply max))}))
+                                 (map :ele)
+                                 (apply max))}))
          (sort-by :kilometer))))
 
 (defn elevation [gpx-resource]
-  (let [points (points gpx-resource)
-        points-with-distance
-        (map-indexed (fn [idx point]
-                       (if (zero? idx)
-                         (assoc point :distance 0)
-                         (assoc point :distance (haversine
-                                                 (nth points (dec idx)) point))))
-                     points)
-        points-with-cumulative-distance
-        (map-indexed (fn [idx point]
-                       (assoc point :cumulative-distance
-                              (reduce + (map :distance
-                                             (take idx points-with-distance)))))
-                     points-with-distance)
-        grouped-by-kilometer (group-by-kilometer points-with-cumulative-distance)]
-    grouped-by-kilometer))
+  (-> gpx-resource
+      points
+      points-with-cumulative-distance
+      group-by-kilometer))
 
 (defn total-distance [gpx-resource]
   (->> (points gpx-resource)
@@ -73,8 +78,9 @@
        (reduce +)))
 
 (defn partition-according-to-plan
-  "Given a GPX-FILE (a file resource name) and a plan, it returns
-  an array of GPX content strings, representing the original GPX divided into chunks"
-  [gpx-file plan]
+  "Given a GPX file (the content of, the result of calling xml/xml-data)
+  and a plan, it returns a new GPX content strings, with segments
+  added representing different chunks of the plan"
+  [gpx-content plan]
   (let [daily-kilometers (plan/daily-kilometers plan)]
     ))

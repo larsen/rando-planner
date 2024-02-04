@@ -3,6 +3,7 @@
   (:require [rando-planner.gpx :as gpx]
             [rando-planner.diagram :as diagram]
             [rando-planner.leaflet :as leaflet]
+            [rando-planner.plan :as plan]
             [nextjournal.clerk :as clerk]))
 
 ;; # Venetogravel 2024
@@ -16,7 +17,6 @@
   {:gpx "https://stefanorodighiero.net/misc/VG-2024_400k_lake_provvis.gpx"
    :center [45.478431 11.439041]
    :zoom 9})
-
 
 (def gpx-resource "gpx/VG-2024_400k_lake_provvis.gpx")
 
@@ -66,6 +66,15 @@
 (clerk/html
  (diagram/plan->diagram plan-start-19))
 
+(clerk/with-viewer leaflet/leaflet-gpx-viewer
+  {:gpx "https://stefanorodighiero.net/misc/VG-2024_400k_lake_provvis.gpx"
+   ;; :gpx-content gpx-content
+   :center [45.478431 11.439041]
+   :markers (plan/points-at-daily-kilometers
+             gpx-resource
+             plan-start-19)
+   :zoom 9})
+
 
 (def plan-start-20
   {:description "Partenza il 20"
@@ -81,3 +90,12 @@
 
 (clerk/html
  (diagram/plan->diagram plan-start-20))
+
+(clerk/with-viewer leaflet/leaflet-gpx-viewer
+  {:gpx "https://stefanorodighiero.net/misc/VG-2024_400k_lake_provvis.gpx"
+   ;; :gpx-content gpx-content
+   :center [45.478431 11.439041]
+   :markers (plan/points-at-daily-kilometers
+             gpx-resource
+             plan-start-20)
+   :zoom 9})

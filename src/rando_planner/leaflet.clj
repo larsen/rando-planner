@@ -1,5 +1,7 @@
 (ns rando-planner.leaflet
-  (:require [nextjournal.clerk :as clerk]))
+  (:require [nextjournal.clerk :as clerk]
+            [rando-planner.gpx :as gpx]
+            [rando-planner.plan :as plan]))
 
 (def leaflet-gpx-viewer
   {:transform-fn clerk/mark-presented
@@ -31,4 +33,8 @@
                                                     (:zoom value))
                                           (.addTo tile-layer m)
                                           (.addTo gpx-layer m)
+                                          (when (:markers value)
+                                            (.log js/console (clj->js (:markers value)))
+                                            (doseq [pp (:markers value)]
+                                              (.addTo (.marker js/L (clj->js [(:lat pp) (:lon pp)])) m)))
                                           )))}]))]))})
