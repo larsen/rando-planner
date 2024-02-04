@@ -20,7 +20,7 @@
 
 (def gpx-resource "gpx/VG-2024_400k_lake_provvis.gpx")
 
-;; Il percorso non presenta sezioni particuolarmente
+;; Il percorso non presenta sezioni particolarmente
 ;; impegnative quanto ad elevazione.
 
 (let [elevation (gpx/elevation gpx-resource)]
