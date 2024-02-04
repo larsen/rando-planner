@@ -28,13 +28,12 @@
                                                                           (:gpx-content value))
                                                              (clj->js {:async true
                                                                        :marker_options marker-options}))]
-                                          (.setView m
-                                                    (clj->js (:center value))
-                                                    (:zoom value))
+                                          (if (:bounds value)
+                                            (.fitBounds m (clj->js (:bounds value)))
+                                            (.setView m (clj->js (:center value)) (:zoom value)))
                                           (.addTo tile-layer m)
                                           (.addTo gpx-layer m)
                                           (when (:markers value)
                                             (.log js/console (clj->js (:markers value)))
                                             (doseq [pp (:markers value)]
-                                              (.addTo (.marker js/L (clj->js [(:lat pp) (:lon pp)])) m)))
-                                          )))}]))]))})
+                                              (.addTo (.marker js/L (clj->js [(:lat pp) (:lon pp)])) m))))))}]))]))})

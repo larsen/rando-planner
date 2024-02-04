@@ -18,7 +18,7 @@
 (clerk/with-viewer leaflet/leaflet-gpx-viewer
   {:gpx "https://stefanorodighiero.net/misc/VG-2024_400k_lake_provvis.gpx"
    :center (gpx/center (gpx/points gpx-resource))
-   :zoom 9})
+   :bounds (gpx/bounds (gpx/points gpx-resource))})
 
 ;; Il percorso non presenta sezioni particolarmente
 ;; impegnative quanto ad elevazione.
@@ -70,10 +70,10 @@
   {:gpx "https://stefanorodighiero.net/misc/VG-2024_400k_lake_provvis.gpx"
    ;; :gpx-content gpx-content
    :center (gpx/center (gpx/points gpx-resource))
+   :bounds (gpx/bounds (gpx/points gpx-resource))
    :markers (plan/points-at-daily-kilometers
              gpx-resource
-             plan-start-19)
-   :zoom 9})
+             plan-start-19)})
 
 
 (def plan-start-20
@@ -95,7 +95,7 @@
   {:gpx "https://stefanorodighiero.net/misc/VG-2024_400k_lake_provvis.gpx"
    ;; :gpx-content gpx-content
    :center (gpx/center (gpx/points gpx-resource))
+   :bounds (gpx/bounds (gpx/points gpx-resource))
    :markers (plan/points-at-daily-kilometers
              gpx-resource
-             plan-start-20)
-   :zoom 9})
+             plan-start-20)})
