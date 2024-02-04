@@ -13,12 +13,12 @@
 ;; Il percorso che sto considerando è lo Short Lake,
 ;; che consiste in un totale di circa 400 chilometri.
 
+(def gpx-resource "gpx/VG-2024_400k_lake_provvis.gpx")
+
 (clerk/with-viewer leaflet/leaflet-gpx-viewer
   {:gpx "https://stefanorodighiero.net/misc/VG-2024_400k_lake_provvis.gpx"
-   :center [45.478431 11.439041]
+   :center (gpx/center (gpx/points gpx-resource))
    :zoom 9})
-
-(def gpx-resource "gpx/VG-2024_400k_lake_provvis.gpx")
 
 ;; Il percorso non presenta sezioni particolarmente
 ;; impegnative quanto ad elevazione.
@@ -69,7 +69,7 @@
 (clerk/with-viewer leaflet/leaflet-gpx-viewer
   {:gpx "https://stefanorodighiero.net/misc/VG-2024_400k_lake_provvis.gpx"
    ;; :gpx-content gpx-content
-   :center [45.478431 11.439041]
+   :center (gpx/center (gpx/points gpx-resource))
    :markers (plan/points-at-daily-kilometers
              gpx-resource
              plan-start-19)
@@ -94,7 +94,7 @@
 (clerk/with-viewer leaflet/leaflet-gpx-viewer
   {:gpx "https://stefanorodighiero.net/misc/VG-2024_400k_lake_provvis.gpx"
    ;; :gpx-content gpx-content
-   :center [45.478431 11.439041]
+   :center (gpx/center (gpx/points gpx-resource))
    :markers (plan/points-at-daily-kilometers
              gpx-resource
              plan-start-20)

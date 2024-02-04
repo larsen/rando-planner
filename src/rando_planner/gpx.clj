@@ -22,6 +22,24 @@
                 :ele (Double. ele)}))
            trkpts))))
 
+(defn center
+  "Given a set of points (represented as dictionaries with a :lat and a :lon),
+  it returns the centre of those points. Useful to display the GPX
+  track on a map"
+  [points]
+  (loop [i 0 min-lat 180 max-lat 0 min-lon 180 max-lon 0]
+    (if (< i (count points))
+      (let [p (nth points i)
+            lat (:lat p)
+            lon (:lon p)]
+        (recur (inc i)
+               (min min-lat lat)
+               (max max-lat lat)
+               (min min-lon lon)
+               (max max-lon lon)))
+      [(+ min-lat (/ (- max-lat min-lat) 2 ))
+       (+ min-lon (/ (- max-lon min-lon) 2 ))])))
+
 (defn haversine [point1 point2]
   (let [earth-radius 6371
         lat1 (Math/toRadians (:lat point1))
