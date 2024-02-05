@@ -100,11 +100,3 @@
        (map (fn [[point1 point2]]
               (haversine point1 point2)))
        (reduce +)))
-
-(defn partition-according-to-plan
-  "Given a GPX file (the content of, the result of calling xml/xml-data)
-  and a plan, it returns a new GPX content strings, with segments
-  added representing different chunks of the plan"
-  [gpx-content plan]
-  (let [daily-kilometers (plan/daily-kilometers plan)]
-    ))
