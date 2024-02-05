@@ -16,7 +16,7 @@
 
 (defn add-plan-markers [value]
   (if (and (:plan value)
-             (:gpx-resource value))
+           (:gpx-resource value))
     (assoc value :markers (plan/points-at-daily-kilometers
                            (:gpx-resource value)
                            (:plan value)))
@@ -36,17 +36,17 @@
                     {:package ["leaflet@1.7.1/dist/leaflet.min.js"
                                "leaflet-gpx@1.5.1/gpx.min.js"]}
                     (fn [leaflet]
-                      (let [map-div-id (str (gensym))]
+                      (let [map-div-id (str (gensym))
+                            attribution "&copy; <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a>"
+                            marker-options {:startIconUrl "https://stefanorodighiero.net/misc/pin-icon-start.png"
+                                            :endIconUrl "https://stefanorodighiero.net/misc/pin-icon-end.png"
+                                            :shadowUrl "https://stefanorodighiero.net/misc/pin-shadow.png"}]
                         [:div {:id map-div-id
                                :height "400px"
                                :style {:height "400px"}
                                :ref (fn [el]
                                       (when el
-                                        (let [attribution "&copy; <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a>"
-                                              marker-options {:startIconUrl "https://stefanorodighiero.net/misc/pin-icon-start.png"
-                                                              :endIconUrl "https://stefanorodighiero.net/misc/pin-icon-end.png"
-                                                              :shadowUrl "https://stefanorodighiero.net/misc/pin-shadow.png"}
-                                              m (.map js/L map-div-id)
+                                        (let [m (.map js/L map-div-id)
                                               tile-layer (.tileLayer js/L "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
                                                                      (clj->js {:attribution attribution}))
                                               gpx-layer (new js/L.GPX (or (:gpx value)
@@ -59,6 +59,5 @@
                                           (.addTo tile-layer m)
                                           (.addTo gpx-layer m)
                                           (when (:markers value)
-                                            (.log js/console (clj->js (:markers value)))
                                             (doseq [pp (:markers value)]
                                               (.addTo (.marker js/L (clj->js [(:lat pp) (:lon pp)])) m))))))}]))]))})
