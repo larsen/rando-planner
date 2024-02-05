@@ -1,10 +1,35 @@
 (ns rando-planner.leaflet
   (:require [nextjournal.clerk :as clerk]
+            ; [nextjournal.clerk.viewer :as v]
+            [rando-planner.xml :as xml]
             [rando-planner.gpx :as gpx]
             [rando-planner.plan :as plan]))
 
+(defn add-center-and-bounds [value]
+  (if (:gpx-resource value)
+    (let [points (gpx/points (:gpx-resource value))]
+      (assoc value
+             :gpx-content (xml/xml-data-raw (:gpx-resource value))
+             :center (gpx/center points)
+             :bounds (gpx/bounds points)))
+    value))
+
+(defn add-plan-markers [value]
+  (if (and (:plan value)
+             (:gpx-resource value))
+    (assoc value :markers (plan/points-at-daily-kilometers
+                           (:gpx-resource value)
+                           (:plan value)))
+    value))
+
+(defn enrich-with-gpx-details [value]
+  (-> value
+      add-center-and-bounds
+      add-plan-markers))
+
 (def leaflet-gpx-viewer
-  {:transform-fn clerk/mark-presented
+  {:transform-fn (comp clerk/mark-presented
+                       (clerk/update-val enrich-with-gpx-details))
    :render-fn '(fn [value]
                  (when value
                    [nextjournal.clerk.render/with-d3-require

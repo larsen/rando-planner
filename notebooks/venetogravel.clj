@@ -3,7 +3,6 @@
   (:require [rando-planner.gpx :as gpx]
             [rando-planner.diagram :as diagram]
             [rando-planner.leaflet :as leaflet]
-            [rando-planner.plan :as plan]
             [nextjournal.clerk :as clerk]))
 
 ;; # Venetogravel 2024
@@ -16,9 +15,7 @@
 (def gpx-resource "gpx/VG-2024_400k_lake_provvis.gpx")
 
 (clerk/with-viewer leaflet/leaflet-gpx-viewer
-  {:gpx "https://stefanorodighiero.net/misc/VG-2024_400k_lake_provvis.gpx"
-   :center (gpx/center (gpx/points gpx-resource))
-   :bounds (gpx/bounds (gpx/points gpx-resource))})
+  {:gpx-resource gpx-resource})
 
 ;; Il percorso non presenta sezioni particolarmente
 ;; impegnative quanto ad elevazione.
@@ -67,14 +64,8 @@
  (diagram/plan->diagram plan-start-19))
 
 (clerk/with-viewer leaflet/leaflet-gpx-viewer
-  {:gpx "https://stefanorodighiero.net/misc/VG-2024_400k_lake_provvis.gpx"
-   ;; :gpx-content gpx-content
-   :center (gpx/center (gpx/points gpx-resource))
-   :bounds (gpx/bounds (gpx/points gpx-resource))
-   :markers (plan/points-at-daily-kilometers
-             gpx-resource
-             plan-start-19)})
-
+  {:gpx-resource gpx-resource
+   :plan plan-start-19})
 
 (def plan-start-20
   {:description "Partenza il 20"
@@ -92,10 +83,5 @@
  (diagram/plan->diagram plan-start-20))
 
 (clerk/with-viewer leaflet/leaflet-gpx-viewer
-  {:gpx "https://stefanorodighiero.net/misc/VG-2024_400k_lake_provvis.gpx"
-   ;; :gpx-content gpx-content
-   :center (gpx/center (gpx/points gpx-resource))
-   :bounds (gpx/bounds (gpx/points gpx-resource))
-   :markers (plan/points-at-daily-kilometers
-             gpx-resource
-             plan-start-20)})
+  {:gpx-resource gpx-resource
+   :plan plan-start-20})
