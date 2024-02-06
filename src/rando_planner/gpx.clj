@@ -1,6 +1,5 @@
 (ns rando-planner.gpx
-  (:require [rando-planner.xml :as xml]
-            [rando-planner.plan :as plan]))
+  (:require [rando-planner.xml :as xml]))
 
 (defn points [gpx-resource]
   (letfn [(pick-tag [tag data]
