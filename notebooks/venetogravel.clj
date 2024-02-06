@@ -7,18 +7,17 @@
 
 ;; # Venetogravel 2024
 
-;; ## Note e pianificazione
+;; ## Notes and planning
 
-;; Il percorso che sto considerando è lo Short Lake,
-;; che consiste in un totale di circa 400 chilometri.
+;; I'm considering the Short Lake route,
+;; consisting in a total of 400 kilometers.
 
 (def gpx-resource "gpx/VG-2024_400k_lake_provvis.gpx")
 
 (clerk/with-viewer leaflet/leaflet-gpx-viewer
   {:gpx-resource gpx-resource})
 
-;; Il percorso non presenta sezioni particolarmente
-;; impegnative quanto ad elevazione.
+;; The route does not show particularly challenging climbs.
 
 (let [elevation (gpx/elevation gpx-resource)]
   (clerk/html
@@ -28,16 +27,14 @@
                                 :to 400
                                 :viewbox [0 0 600 200]})]))
 
-;; Penso di poter mantenere una velocità media di 20 km/h lungo tutto
-;; il percorso (con adeguato riposo).  Questa quantità dovrebbe essere
-;; in realtà ulteriormente abbassata, perché per come uso il dato
-;; questo esprime anche tutto il tempo speso facendo pause (per fare
-;; foto, consultare mappe, riposare, mangiare e bere, e cose di questo
-;; tipo).
+;; I think I can maintain an average speed of 20 km/h
+;; (this quantity ought to be further decreased because of how
+;; I use the parameter, that is it includes time I spend in short pauses
+;; to take pictures, consult the map, eat, and stuff like that…)
 
 (def average-speed 20)
 
-;; Ne risulta un tempo totale
+;; Resulting total time
 
 ^{:nextjournal.clerk/visibility {:code :fold}}
 (defn total-time-required []
@@ -47,6 +44,10 @@
 (total-time-required)
 
 ;; ### Scenari
+
+;; The first scenario starts in the afternoon of the first day.
+;; Pedaling until dark then find a place for the night.
+;; The second day is the largest effort.
 
 (def plan-start-19
   {:description "Starting on April 19th"
@@ -66,6 +67,9 @@
 (clerk/with-viewer leaflet/leaflet-gpx-viewer
   {:gpx-resource gpx-resource
    :plan plan-start-19})
+
+;; Another possibility is starting on the 20th,
+;; so having a long ahead immediately. Perhaps too ambitious?
 
 (def plan-start-20
   {:description "Partenza il 20"
