@@ -1,6 +1,5 @@
 (ns rando-planner.diagram
   (:require [clojure.string :as str]
-            [nextjournal.clerk :as clerk]
             [rando-planner.gpx :as gpx]
             [rando-planner.plan :as plan]))
 
@@ -55,15 +54,36 @@
         max-elevation (->> elevation
                            (map :elevation)
                            (apply max))
-        points (points-in-viewbox-space selected-elevation
-                                        [from to
-                                         min-elevation
-                                         max-elevation]
-                                        viewbox)]
-    [:path {:stroke "orange"
-            :stroke-width 1
-            :fill "none"
-            :d (points->path points)}]))
+        pointspace [from to min-elevation max-elevation]
+        points (points-in-viewbox-space selected-elevation pointspace viewbox)
+        {x1 :x y1 :y} (pointspace-to-viewbox-space
+                       {:x to :y max-elevation
+                        :pointspace pointspace
+                        :viewbox viewbox})
+        {x2 :x y2 :y} (pointspace-to-viewbox-space
+                       {:x to :y min-elevation
+                        :pointspace pointspace
+                        :viewbox viewbox})]
+    [:g
+     ;; [:line {:x1 x1 :y1 y1
+     ;;         :x2 x2 :y2 y2
+     ;;         :stroke "black"}]
+     ;; [:text {:x (- x1 15)
+     ;;         :y y2
+     ;;         :font-family "Fira Sans"
+     ;;         :font-size "50%"
+     ;;         :fill "black"}
+     ;;  (str min-elevation)]
+     ;; [:text {:x (- x1 35)
+     ;;         :y 12
+     ;;         :font-family "Fira Sans"
+     ;;         :font-size "50%"
+     ;;         :fill "black"}
+     ;;  (str max-elevation)]
+     [:path {:stroke "orange"
+             :stroke-width 1
+             :fill "none"
+             :d (points->path points)}]]))
 
 (defn pauses-diagram [{:keys [pauses]}]
   (loop [i 0
