@@ -54,11 +54,14 @@
    :gpx gpx-resource
    :average-speed average-speed
    :daily-plans [{:label "Day 1"
+                  :date "2024-04-19"
                   :activities [{:start "15:00" :length 6 :type :ride}]}
                  {:label "Day 2"
+                  :date "2024-04-20"
                   :activities [{:start "07:00" :length 5 :type :ride}
                                {:start "17:00" :length 3 :type :ride}]}
                  {:label "Day 3"
+                  :date "2024-04-21"
                   :activities [{:start "08:00" :length 6 :type :ride}]}]})
 
 (clerk/html
@@ -68,6 +71,7 @@
   {:gpx-resource gpx-resource
    :plan plan-start-19})
 
+
 ;; Another possibility is starting on the 20th,
 ;; so having a long ahead immediately. Perhaps too ambitious?
 
@@ -76,12 +80,16 @@
    :gpx gpx-resource
    :average-speed average-speed
    :daily-plans [{:label "Giorno 1"
+                  :date "2024-04-20"
                   :activities [{:start "8:00" :length 8 :type :ride}]}
                  {:label "Giorno 2"
+                  :date "2024-04-21"
                   :activities [{:start "07:00" :length 5 :type :ride}
                                {:start "17:00" :length 3 :type :ride}]}
                  {:label "Giorno 3"
+                  :date "2024-04-22"
                   :activities [{:start "09:00" :length 4 :type :ride}]}]})
+
 
 (clerk/html
  (diagram/plan->diagram plan-start-20))

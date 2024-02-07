@@ -1,7 +1,12 @@
 (ns rando-planner.diagram
   (:require [clojure.string :as str]
+            [clj-time.core :as t]
+            [clj-time.format :as f]
+            [clj-time.coerce :as c]
             [rando-planner.gpx :as gpx]
-            [rando-planner.plan :as plan]))
+            [rando-planner.plan :as plan]
+            [rando-planner.suncalc :as suncalc]
+            [nextjournal.clerk :as clerk]))
 
 (alter-var-root #'nextjournal.clerk.view/include-css+js
                 (fn [include-fn]
@@ -80,7 +85,7 @@
      ;;         :font-size "50%"
      ;;         :fill "black"}
      ;;  (str max-elevation)]
-     [:path {:stroke "orange"
+     [:path {:stroke "red"
              :stroke-width 1
              :fill "none"
              :d (points->path points)}]]))
@@ -111,37 +116,52 @@
                               " hour(s)")]]))))
       pauses-diagram)))
 
-(defn single-activity-streak [activity
-                              offset-of-previous-activities
-                              kilometers
-                              average-speed]
-  (let [type (:type activity)
-        margin (+ left-margin
-                  offset-of-previous-activities)
-        color (if (= type :ride)
-                "yellow"
-                "white")]
+(defn single-activity-streak [{:keys [activity day-plan
+                                      average-speed
+                                      gpx-center
+                                      offset-of-previous-activities
+                                      kilometers]}]
+  (let [[lat lon] gpx-center
+        [sunrise sunset] (suncalc/sunset-sunrise-times
+                          (+ (/ 86400 2)
+                             (/ (c/to-long (plan/string-to-date (:date day-plan)))
+                                1000))
+                          lat lon 0)
+        margin (+ left-margin offset-of-previous-activities)]
     (for [n (range (:length activity))]
-      [:g
-       [:text {:x (+ margin box-size (* n box-size))
-               :y 25
-               :font-family "Fira Sans"
-               :font-size ".2em"
-               :text-anchor "middle"}
-        (plan/time-after-n-hours (:start activity) (+ 1 n))]
-       [:rect {:x (+ margin (* n box-size))
-               :y box-size
-               :width box-size :height box-size
-               :fill color
-               :stroke "black"
-               :stroke-width 0.5}]
-       [:text {:x (+ margin 5 (* n box-size)) :y 17
-               :font-family "Fira Sans"
-               :font-size ".22em"
-               :text-anchor "middle"}
-        (str (+ kilometers (* average-speed (+ 1 n))))]])))
+      (let [start (f/parse (f/formatter "YYYY-MM-DD HH:mm")
+                           (str (:date day-plan) " " (:start activity)))
+            t1 (t/plus start (t/hours (+ 1 n)))
+            t1-str (f/unparse (f/formatter "HH:mm") t1)
+            before-sunrise? (t/before? t1 sunrise)
+            after-sunset? (t/after? t1 sunset)]
+        [:g
+         [:text {:x (+ margin box-size (* n box-size))
+                 :y 25
+                 :font-family "Fira Sans"
+                 :font-size ".2em"
+                 :text-anchor "middle"}
+          t1-str]
+         [:rect {:x (+ margin (* n box-size))
+                 :y box-size
+                 :width box-size :height box-size
+                 :fill (if (or before-sunrise? after-sunset?)
+                         "#0d3d56" ;; Indigo
+                         "#43abc9")
+                 :stroke "black"
+                 :stroke-width 0.5}]
+         [:text {:x (+ margin 5 (* n box-size))
+                 :y 17
+                 :font-family "Fira Sans"
+                 :font-size ".22em"
+                 :text-anchor "middle"
+                 :fill (if (or before-sunrise? after-sunset?)
+                         "white"
+                         "#0d3d56" ;; Indigo
+                         )}
+          (str (+ kilometers (* average-speed (+ 1 n))))]]))))
 
-(defn day-plan->svg [day-plan km average-speed elevation]
+(defn day-plan->svg [day-plan km average-speed elevation center]
   (let [pauses (plan/pauses day-plan)
         main-offset (* (/ km average-speed) box-size)
         total-km-for-day (plan/kilometers-in-a-day day-plan
@@ -189,10 +209,13 @@
                         (conj activities-diagram
                               (into [:g]
                                     (when (= type :ride)
-                                      (single-activity-streak activity
-                                                              offset
-                                                              kilometers
-                                                              average-speed))))))
+                                      (single-activity-streak
+                                       {:activity activity
+                                        :offset-of-previous-activities offset
+                                        :kilometers kilometers
+                                        :average-speed average-speed
+                                        :day-plan day-plan
+                                        :gpx-center center}))))))
                [:g {:transform "translate(0 20)"}
                 activities-diagram]))])))
 
@@ -237,6 +260,7 @@
 (defn plan->diagram [plan]
   (let [total-distance (gpx/total-distance (:gpx plan))
         elevation (gpx/elevation (:gpx plan))
+        center (gpx/center (gpx/points (:gpx plan)))
         average-speed (:average-speed plan)]
     [:svg {:width diagram-width
            :height diagram-height
@@ -260,5 +284,6 @@
                               (day-plan->svg (nth (:daily-plans plan) i)
                                              total-kilometers-covered
                                              average-speed
-                                             elevation)]))
+                                             elevation
+                                             center)]))
          output))]))
