@@ -3,6 +3,10 @@
             [clj-time.format :as f]
             [rando-planner.gpx :as gpx]))
 
+(defn string-to-date [date-str]
+  (let [formatter (f/formatter "YYYY-MM-DD")]
+    (f/parse formatter date-str)))
+
 (defn string-to-time [time-str]
   (let [formatter (f/formatter "HH:mm")]
     (f/parse formatter time-str)))
@@ -12,7 +16,10 @@
     (f/unparse formatter dt)))
 
 (defn time-after-n-hours [start n]
-  (time-to-string (t/plus (string-to-time start) (t/hours n))))
+  (t/plus (string-to-time start) (t/hours n)))
+
+(defn time-after-n-hours-as-str [start n]
+  (time-to-string (time-after-n-hours start n)))
 
 (defn kilometers-in-a-day [day-plan average-speed]
   (reduce + (map #(* (:length %) average-speed)
