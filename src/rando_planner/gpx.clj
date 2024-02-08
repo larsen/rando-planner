@@ -77,15 +77,12 @@
                  points-with-distance)))
 
 (defn group-by-kilometer [points-with-cumulative-distance]
-  (let [groups (group-by #(->> % :cumulative-distance (Math/floor))
-                         points-with-cumulative-distance)]
-    (->> groups
-         (map (fn [[kilometer group]]
-                {:kilometer kilometer
-                 :elevation (->> group
-                                 (map :ele)
-                                 (apply max))}))
-         (sort-by :kilometer))))
+  (let [partitions (partition-by #(->> % :cumulative-distance (Math/floor))
+                                 points-with-cumulative-distance)]
+    (map (fn [partition]
+           {:kilometer (Math/floor (:cumulative-distance (first partition)))
+            :elevation (apply max (map :ele partition))})
+         partitions)))
 
 (defn elevation [gpx-resource]
   (-> gpx-resource
