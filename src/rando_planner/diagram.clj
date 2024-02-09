@@ -90,7 +90,7 @@
                 :dominant-baseline "hanging"
                 :fill "black"}
          (str max-elevation)]])
-     [:path {:stroke "red"
+     [:path {:stroke "darkgreen"
              :stroke-width 1
              :fill "none"
              :d (points->path points)}]]))
