@@ -38,8 +38,8 @@ use all Clerk features plus those provided by `rando-planner`.
 ```clojure
 (def plan-start-19
   {:description "Starting on April 19th"
-   :gpx gpx-resource
-   :average-speed average-speed
+   :gpx "gpx/route.gpx"
+   :average-speed 20
    :daily-plans [{:label "Day 1"
                   :date "2024-04-19"
                   :activities [{:start "15:00" :length 6 :type :ride}]}
