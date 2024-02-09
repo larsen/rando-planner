@@ -102,7 +102,7 @@
       (let [p (nth pauses i)]
         (recur (inc i)
                (conj pauses-diagram
-                     (let [position-x (* (:after (nth pauses i)) box-size)
+                     (let [position-x (* (:after p) box-size)
                            triangle-vertexes [[position-x 0]
                                               [(- position-x 2) -2]
                                               [(+ position-x 2) -2]]]
@@ -117,7 +117,7 @@
                                 :font-size ".20em"
                                 :fill "darkgreen"
                                 :text-anchor "middle"}
-                         (str (:length (nth pauses i))
+                         (str (:length p)
                               " hour(s)")]]))))
       pauses-diagram)))
 
