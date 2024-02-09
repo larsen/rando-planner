@@ -75,8 +75,9 @@
 
 (defn points-at-daily-kilometers [gpx-resource plan]
   (let [points-wcd (gpx/points-with-cumulative-distance (gpx/points gpx-resource))]
-    (for [dk (rest (daily-kilometers plan))]
+    (for [dk (butlast (daily-kilometers plan))]
       (first (filter (fn [p]
                        (> (:cumulative-distance p)
-                          (:covered dk)))
+                          (+ (:covered dk)
+                             (:kilometers dk))))
                      points-wcd)))))
