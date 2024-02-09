@@ -59,4 +59,4 @@ The screenshots below were automatically generated using
 
 ![Example: plan diagram](rando-planner-example.png)
 
-![Example: route with markers on a map](rando-planner-example.png)
+![Example: route with markers on a map](rando-planner-example-gpx.png)
