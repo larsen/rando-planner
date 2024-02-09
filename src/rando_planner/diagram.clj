@@ -50,6 +50,22 @@
 (def viewbox-dimensions-as-str
   (viewbox-dimensions-to-str viewbox-dimensions))
 
+(def palette
+  {:background "white"
+   :elevation-trend "darkgreen"
+   :elevation-legend-stroke "black"
+   :elevation-legend-text "black"
+   :pause-marker "green"
+   :pause-text "darkgreen"
+   :light-text "#0d3d56" ; Indigo
+   :light-fill "#43abc9"
+   :dark-text "white"
+   :dark-fill "#0d3d56"
+   })
+
+(defn get-from-palette [element]
+  (get palette element "pink"))
+
 (defn elevation-diagram [{:keys [elevation from to viewbox with-legend]}]
   (let [selected-elevation (filter (fn [{x :kilometer}]
                                      (and (>= x from)
@@ -71,26 +87,26 @@
      (when with-legend
        [:g
         [:line {:x1 x1 :y1 y1 :x2 x2 :y2 y2
-                :stroke "black"}]
+                :stroke (get-from-palette :elevation-legend-stroke)}]
         ;; Ticks
         [:line {:x1 x1 :y1 y1 :x2 (- x1 5) :y2 y1
-                :stroke "black"}]
+                :stroke (get-from-palette :elevation-legend-stroke)}]
         [:line {:x1 x1 :y1 y2 :x2 (- x1 5) :y2 y2
-                :stroke "black"}]
+                :stroke (get-from-palette :elevation-legend-stroke)}]
         [:text {:x (- x1 15)
                 :y y2
                 :font-family "Fira Sans"
                 :font-size "50%"
-                :fill "black"}
+                :fill (get-from-palette :elevation-legend-text)}
          (str min-elevation)]
         [:text {:x (- x1 35)
                 :y 0
                 :font-family "Fira Sans"
                 :font-size "50%"
                 :dominant-baseline "hanging"
-                :fill "black"}
+                :fill (get-from-palette :elevation-legend-stroke)}
          (str max-elevation)]])
-     [:path {:stroke "darkgreen"
+     [:path {:stroke (get-from-palette :elevation-trend)
              :stroke-width 1
              :fill "none"
              :d (points->path points)}]]))
@@ -107,7 +123,7 @@
                                               [(- position-x 2) -2]
                                               [(+ position-x 2) -2]]]
                        [:g
-                        [:polygon {:style {:fill "green"}
+                        [:polygon {:style {:fill (get-from-palette :pause-marker)}
                                    :points (->> triangle-vertexes
                                                 (map (partial str/join \,))
                                                 (str/join \space))}]
@@ -115,10 +131,9 @@
                                 :y -3
                                 :font-family "Fira Sans"
                                 :font-size ".20em"
-                                :fill "darkgreen"
+                                :fill (get-from-palette :pause-text)
                                 :text-anchor "middle"}
-                         (str (:length p)
-                              " hour(s)")]]))))
+                         (str (:length p) " hour(s)")]]))))
       pauses-diagram)))
 
 (defn single-activity-streak [{:keys [activity day-plan
@@ -150,9 +165,10 @@
          [:rect {:x (+ margin (* n box-size))
                  :y box-size
                  :width box-size :height box-size
-                 :fill (if (or before-sunrise? after-sunset?)
-                         "#0d3d56" ;; Indigo
-                         "#43abc9")
+                 :fill (get-from-palette
+                        (if (or before-sunrise? after-sunset?)
+                          :dark-fill
+                          :light-fill))
                  :stroke "black"
                  :stroke-width 0.5}]
          [:text {:x (+ margin 5 (* n box-size))
@@ -160,10 +176,11 @@
                  :font-family "Fira Sans"
                  :font-size ".22em"
                  :text-anchor "middle"
-                 :fill (if (or before-sunrise? after-sunset?)
-                         "white"
-                         "#0d3d56" ;; Indigo
-                         )}
+                 :fill (get-from-palette
+                        (if (or before-sunrise? after-sunset?)
+                          :dark-text
+                          :light-text
+                          ))}
           (str (+ kilometers (* average-speed (+ 1 n))))]]))))
 
 (defn day-plan->svg [day-plan km average-speed elevation center]
@@ -242,12 +259,12 @@
                                         (* i box-size))
                                   :y box-size
                                   :width box-size :height box-size
-                                  :fill "white"
+                                  :fill (get-from-palette :background)
                                   :stroke "black"
                                   :stroke-width 0.5}]))
              output))
          ;; Opaque box to create the illusion of ticks
-         [:rect {:x 0 :y 0 :width 400 :height 17 :fill "white"}]
+         [:rect {:x 0 :y 0 :width 400 :height 17 :fill (get-from-palette :background)}]
          (loop [i 0
                 output [:g]]
            (if (< i (/ total-distance average-speed))
