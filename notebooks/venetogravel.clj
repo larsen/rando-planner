@@ -23,6 +23,7 @@
   (clerk/html
    [:svg {:width 600 :height 200}
     (diagram/elevation-diagram {:elevation elevation
+                                :with-legend true
                                 :from 0
                                 :to 400
                                 :viewbox [0 0 600 200]})]))

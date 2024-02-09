@@ -50,7 +50,7 @@
 (def viewbox-dimensions-as-str
   (viewbox-dimensions-to-str viewbox-dimensions))
 
-(defn elevation-diagram [{:keys [elevation from to viewbox]}]
+(defn elevation-diagram [{:keys [elevation from to viewbox with-legend]}]
   (let [selected-elevation (filter (fn [{x :kilometer}]
                                      (and (>= x from)
                                           (< x to)))
@@ -68,21 +68,28 @@
                         :pointspace pointspace
                         :viewbox viewbox})]
     [:g
-     ;; [:line {:x1 x1 :y1 y1
-     ;;         :x2 x2 :y2 y2
-     ;;         :stroke "black"}]
-     ;; [:text {:x (- x1 15)
-     ;;         :y y2
-     ;;         :font-family "Fira Sans"
-     ;;         :font-size "50%"
-     ;;         :fill "black"}
-     ;;  (str min-elevation)]
-     ;; [:text {:x (- x1 35)
-     ;;         :y 12
-     ;;         :font-family "Fira Sans"
-     ;;         :font-size "50%"
-     ;;         :fill "black"}
-     ;;  (str max-elevation)]
+     (when with-legend
+       [:g
+        [:line {:x1 x1 :y1 y1 :x2 x2 :y2 y2
+                :stroke "black"}]
+        ;; Ticks
+        [:line {:x1 x1 :y1 y1 :x2 (- x1 5) :y2 y1
+                :stroke "black"}]
+        [:line {:x1 x1 :y1 y2 :x2 (- x1 5) :y2 y2
+                :stroke "black"}]
+        [:text {:x (- x1 15)
+                :y y2
+                :font-family "Fira Sans"
+                :font-size "50%"
+                :fill "black"}
+         (str min-elevation)]
+        [:text {:x (- x1 35)
+                :y 0
+                :font-family "Fira Sans"
+                :font-size "50%"
+                :dominant-baseline "hanging"
+                :fill "black"}
+         (str max-elevation)]])
      [:path {:stroke "red"
              :stroke-width 1
              :fill "none"
