@@ -67,6 +67,7 @@
                                       (:average-speed plan))]
           (recur (conj result
                        {:day (+ 1 i)
+                        :label (:label (nth daily-plans i))
                         :kilometers km
                         :covered acc-km})
                  (+ acc-km km)
@@ -74,10 +75,16 @@
         result))))
 
 (defn points-at-daily-kilometers [gpx-resource plan]
-  (let [points-wcd (gpx/points-with-cumulative-distance (gpx/points gpx-resource))]
-    (for [dk (butlast (daily-kilometers plan))]
-      (first (filter (fn [p]
-                       (> (:cumulative-distance p)
-                          (+ (:covered dk)
-                             (:kilometers dk))))
-                     points-wcd)))))
+  (let [points-wcd (gpx/points-with-cumulative-distance
+                    (gpx/points gpx-resource))
+        daily-km-plans (butlast (daily-kilometers plan))
+        points-at-end-of-days (for [dk daily-km-plans]
+                                (first (filter (fn [p]
+                                                 (> (:cumulative-distance p)
+                                                    (+ (:covered dk)
+                                                       (:kilometers dk))))
+                                               points-wcd)))]
+    (map merge
+         points-at-end-of-days
+         daily-km-plans
+         )))

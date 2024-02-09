@@ -60,4 +60,12 @@
                                           (.addTo gpx-layer m)
                                           (when (:markers value)
                                             (doseq [pp (:markers value)]
-                                              (.addTo (.marker js/L (clj->js [(:lat pp) (:lon pp)])) m))))))}]))]))})
+                                              (.bindPopup
+                                               (.addTo (.marker js/L (clj->js [(:lat pp) (:lon pp)])) m)
+                                               (str "<small>"
+                                                    "<strong>" (:label pp) "</strong>"
+                                                    "<br />"
+                                                    (.floor js/Math (:kilometers pp))
+                                                    " km / Cumulative "
+                                                    (.floor js/Math (:cumulative-distance pp))
+                                                    " km </small>")))))))}]))]))})
