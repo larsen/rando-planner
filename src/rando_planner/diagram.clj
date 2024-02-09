@@ -56,9 +56,7 @@
                                           (< x to)))
                                    elevation)
         min-elevation 0
-        max-elevation (->> elevation
-                           (map :elevation)
-                           (apply max))
+        max-elevation (reduce max (map :elevation elevation))
         pointspace [from to min-elevation max-elevation]
         points (points-in-viewbox-space selected-elevation pointspace viewbox)
         {x1 :x y1 :y} (pointspace-to-viewbox-space
@@ -164,8 +162,7 @@
 (defn day-plan->svg [day-plan km average-speed elevation center]
   (let [pauses (plan/pauses day-plan)
         main-offset (* (/ km average-speed) box-size)
-        total-km-for-day (plan/kilometers-in-a-day day-plan
-                                                   average-speed)]
+        total-km-for-day (plan/kilometers-in-a-day day-plan average-speed)]
     (into [:svg
            [:text {:x 0 :y 15
                    :font-family "Fira Sans Condensed"
