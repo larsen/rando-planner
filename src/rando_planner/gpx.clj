@@ -23,18 +23,14 @@
 
 (defn bounds
   [points]
-  (loop [i 0 min-lat 180 max-lat 0 min-lon 180 max-lon 0]
-    (if (< i (count points))
-      (let [p (nth points i)
-            lat (:lat p)
-            lon (:lon p)]
-        (recur (inc i)
-               (min min-lat lat)
-               (max max-lat lat)
-               (min min-lon lon)
-               (max max-lon lon)))
+  (let [lats (map :lat points)
+        lons (map :lon points)
+        min-lat (apply min lats)
+        max-lat (apply max lats)
+        min-lon (apply min lons)
+        max-lon (apply max lons)]
       [[min-lat min-lon]
-       [max-lat max-lon]])))
+       [max-lat max-lon]]))
 
 (defn center
   "Given a set of points (represented as dictionaries with a :lat and a :lon),
@@ -69,23 +65,20 @@
                points))
 
 (defn points-with-cumulative-distance [points]
-  (let [points-with-distance (points-with-distance points)]
+  (let [points-with-distance (points-with-distance points)
+        cumulative-distances (reductions + 0 (map :distance points-with-distance))]
     (map-indexed (fn [idx point]
                    (assoc point :cumulative-distance
-                          (reduce + (map :distance
-                                         (take idx points-with-distance)))))
+                          (nth cumulative-distances idx)))
                  points-with-distance)))
 
 (defn group-by-kilometer [points-with-cumulative-distance]
-  (let [groups (group-by #(->> % :cumulative-distance (Math/floor))
-                         points-with-cumulative-distance)]
-    (->> groups
-         (map (fn [[kilometer group]]
-                {:kilometer kilometer
-                 :elevation (->> group
-                                 (map :ele)
-                                 (apply max))}))
-         (sort-by :kilometer))))
+  (let [partitions (partition-by #(->> % :cumulative-distance (Math/floor))
+                                 points-with-cumulative-distance)]
+    (map (fn [partition]
+           {:kilometer (Math/floor (:cumulative-distance (first partition)))
+            :elevation (apply max (map :ele partition))})
+         partitions)))
 
 (defn elevation [gpx-resource]
   (-> gpx-resource
