@@ -308,3 +308,7 @@
                                              elevation
                                              center)]))
          output))]))
+
+(def plan-viewer
+  {:transform-fn (comp clerk/mark-presented
+                       (clerk/update-val #(clerk/html (plan->diagram %))))})

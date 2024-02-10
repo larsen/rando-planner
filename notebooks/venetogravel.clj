@@ -51,6 +51,8 @@
 ;; Pedaling until dark then find a place for the night.
 ;; The second day is the largest effort.
 
+^{::clerk/viewer diagram/plan-viewer
+  :nextjournal.clerk/visibility {:code :hide}}
 (def plan-start-19
   {:description "Starting on April 19th"
    :gpx gpx-resource
@@ -66,15 +68,13 @@
                   :date "2024-04-21"
                   :activities [{:start "08:00" :length 6 :type :ride}]}]})
 
-(clerk/html
- (diagram/plan->diagram plan-start-19))
-
 (clerk/with-viewer leaflet/leaflet-gpx-viewer plan-start-19)
-
 
 ;; Another possibility is starting on the 20th,
 ;; so having a long ahead immediately. Perhaps too ambitious?
 
+^{::clerk/viewer diagram/plan-viewer
+  :nextjournal.clerk/visibility {:code :hide}}
 (def plan-start-20
   {:description "Partenza il 20"
    :gpx gpx-resource
@@ -89,9 +89,5 @@
                  {:label "Giorno 3"
                   :date "2024-04-22"
                   :activities [{:start "09:00" :length 4 :type :ride}]}]})
-
-
-(clerk/html
- (diagram/plan->diagram plan-start-20))
 
 (clerk/with-viewer leaflet/leaflet-gpx-viewer plan-start-20)
