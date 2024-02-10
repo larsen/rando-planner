@@ -5,22 +5,20 @@
             [rando-planner.gpx :as gpx]
             [rando-planner.plan :as plan]))
 
-(defn add-center-and-bounds [value]
-  (if (:gpx-resource value)
-    (let [points (gpx/points (:gpx-resource value))]
-      (assoc value
-             :gpx-content (xml/xml-data-raw (:gpx-resource value))
+(defn add-center-and-bounds [plan]
+  (if (:gpx plan)
+    (let [points (gpx/points (:gpx plan))]
+      (assoc plan
+             :gpx-content (xml/xml-data-raw (:gpx plan))
              :center (gpx/center points)
              :bounds (gpx/bounds points)))
-    value))
+    plan))
 
-(defn add-plan-markers [value]
-  (if (and (:plan value)
-           (:gpx-resource value))
-    (assoc value :markers (plan/points-at-daily-kilometers
-                           (:gpx-resource value)
-                           (:plan value)))
-    value))
+(defn add-plan-markers [plan]
+  (if (and (:gpx plan)
+           (:daily-plans plan))
+    (assoc plan :markers (plan/points-at-daily-kilometers plan))
+    plan))
 
 (defn enrich-with-gpx-details [value]
   (-> value
@@ -49,8 +47,7 @@
                                         (let [m (.map js/L map-div-id)
                                               tile-layer (.tileLayer js/L "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
                                                                      (clj->js {:attribution attribution}))
-                                              gpx-layer (new js/L.GPX (or (:gpx value)
-                                                                          (:gpx-content value))
+                                              gpx-layer (new js/L.GPX (:gpx-content value)
                                                              (clj->js {:async true
                                                                        :marker_options marker-options}))]
                                           (if (:bounds value)

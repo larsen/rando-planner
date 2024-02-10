@@ -3,7 +3,8 @@
   (:require [rando-planner.gpx :as gpx]
             [rando-planner.diagram :as diagram]
             [rando-planner.leaflet :as leaflet]
-            [nextjournal.clerk :as clerk]))
+            [nextjournal.clerk :as clerk]
+            [nextjournal.clerk.viewer :as v]))
 
 ;; # Venetogravel 2024
 
@@ -15,7 +16,7 @@
 (def gpx-resource "gpx/VG-2024_400k_lake_provvis.gpx")
 
 (clerk/with-viewer leaflet/leaflet-gpx-viewer
-  {:gpx-resource gpx-resource})
+  {:gpx gpx-resource})
 
 ;; The route does not show particularly challenging climbs.
 
@@ -68,9 +69,7 @@
 (clerk/html
  (diagram/plan->diagram plan-start-19))
 
-(clerk/with-viewer leaflet/leaflet-gpx-viewer
-  {:gpx-resource gpx-resource
-   :plan plan-start-19})
+(clerk/with-viewer leaflet/leaflet-gpx-viewer plan-start-19)
 
 
 ;; Another possibility is starting on the 20th,
@@ -95,6 +94,4 @@
 (clerk/html
  (diagram/plan->diagram plan-start-20))
 
-(clerk/with-viewer leaflet/leaflet-gpx-viewer
-  {:gpx-resource gpx-resource
-   :plan plan-start-20})
+(clerk/with-viewer leaflet/leaflet-gpx-viewer plan-start-20)
