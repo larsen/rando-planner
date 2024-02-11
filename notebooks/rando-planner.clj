@@ -9,16 +9,14 @@
 ;; #### Custom viewers for [Clerk](https://github.com/nextjournal/clerk) for planning multi-day bike routes
 
 ^{:nextjournal.clerk/visibility {:code :hide}}
-(javax.imageio.ImageIO/read
- (java.net.URL.
-  "https://stefanorodighiero.net/misc/rando-planner-cover.jpg"))
+(clerk/image "rando-planner-index.jpg")
 
-;; # rando-planner 🚲
+;; # [rando-planner](https://github.com/larsen/rando-planner) 🚲
 
 
 ;; **rando-planner**:
 
-;; - allows to break down the route with more control, providing
+;; - allows users to break down the route with more control, providing
 ;; visualization tools that help evaluating and comparing different
 ;; plans
 
@@ -28,15 +26,18 @@
 
 ;; - is based on Clerk, a notebook library for Clojure
 
+;; Traditional tools (such as Komoot, Strava, Cycle.travel, etc.)
+;; focus on planning the route itself and, in some cases (like
+;; Komoot), offer extra tools to divide the route into multiple days,
+;; but they distribute distance uniformly across the days.
 
-;; Traditional tools (Komoot, Strava, Cycle.travel, and so on…) focus
-;; on planning the route itself, and in some cases (Komoot) providing
-;; extra tools to divide the route into multiple days, distributing
-;; the distance to cover roughly the same way.
-
-;; After a data structure called plan is defined, rando-planner provides different types of visualization that can be used to study different strategies to cover the distance.
+;; rando-planner provides different types of visualization that can be
+;; used to study different strategies to cover the distance.
 
 ;; This page has been composed with Clerk and rando-planner
+
+;; You can see the code for the project [on
+;; github.com](https://github.com/larsen/rando-planner).
 
 
 ;; ## Features
@@ -56,22 +57,22 @@
 
 ;; ## Usage example
 
-;; Suppose you want to plan a bike trip from Berlin to Rostock, in
-;; Spring. You already prepared a GPX route using your favorite tool,
-;; but you want to study how can you cover the distance over multiple
-;; days.
+;; Suppose you want to plan a bike trip from Berlin to Rostock, in the
+;; Spring. You've already prepared a GPX route using your favorite
+;; tool, but now you want to study different ways to cover the
+;; distance over multiple days.
 
 ^{:nextjournal.clerk/visibility {:code :hide}}
 (clerk/html [:div {:class "bg-amber-100 p-2"}
              [:h3 {:class "!text-black"} "⚠️ Important note"]
              [:span {:class "text-black"}
-              "In general, it's not a good idea to stick to distance
-plans when preparing to a bike journey.  rando-planner is intended as
-a tool to assist in studying different scenarios, and prepare for them
-as much as possible. But things happen, and you can not know in
-advance what you will encounter (bad weather, a closed road, a road
-you really want to explore, and so forth…). Falling below your daily
-distance plans could be morale crushing."]])
+              "In general, it's not a good idea to strictly adhere to
+distance plans when preparing for bike journey.  rando-planner is
+intended as a tool to assist in studying different scenarios, and
+preparing for them as much as possible. However, unexpected events can
+occur, such as bad weather, road closures, or discovering a route you
+really want to explore. Falling short your daily distance plans could
+be morale-crushing."]])
 
 ;; Put the GPX file in the `resources/` directory (or a
 ;; sub-directory). For the sake of the example, let's say you choose
@@ -86,7 +87,6 @@ distance plans could be morale crushing."]])
  '(ns notebooks.berko2024
     (:require [rando-planner.diagram :as diagram]
               [rando-planner.gpx :as gpx]
-              [rando-planner.plan :as plan]
               [rando-planner.leaflet :as leaflet]
               [nextjournal.clerk :as clerk])))
 
@@ -97,12 +97,12 @@ distance plans could be morale crushing."]])
   ;; (no need to specify `resources` in the path)
   {:gpx "gpx/be-rostock.gpx"})
 
-;; So far so good. How many kilometers you have to cover to reach Copenhagen?
+;; So far so good. How many kilometers you have to cover to reach Rostock?
 
 (gpx/total-distance "gpx/be-rostock.gpx")
 
-;; But distance alone is not enough to get an idea. Let's have a look
-;; at the elevation
+;; Distance alone is not enough to get an idea of the effort. Let's
+;; have a look at the elevation
 
 (let [elevation (gpx/elevation "gpx/be-rostock.gpx")]
   (clerk/html
@@ -115,7 +115,7 @@ distance plans could be morale crushing."]])
 
 
 ;; Let's say we feel like we can maintain an
-;; average speed of 18 km/h during the entire journey.
+;; average speed of 18 km/h throughout the entire journey.
 ;; Let's see how many hours on saddle will result:
 
 (def average-speed 18)
@@ -127,6 +127,7 @@ distance plans could be morale crushing."]])
 ;; Let's put together a plan. First idea would be to split the time
 ;; in two equivalent days:
 
+^{::clerk/visibility {:result :hide}}
 (def equally-split-plan
   {:gpx "gpx/be-prg.gpx"
    :average-speed average-speed
@@ -137,23 +138,27 @@ distance plans could be morale crushing."]])
                   :label "Second day"
                   :activities [{:start "08:00" :type :ride :length 10}]}]})
 
-;; We defined the GPX route we're going to use, the average speed we
-;; intend to maintain, and we defined a vector of plans (one for each
-;; day).  Each individual plan contains the date when we're going to
-;; ride, and a vector of activities. We can now obtain a diagram of
-;; the journey
+;; We've defined the GPX route we're going to use and the average
+;; speed we intend to maintain. Additionally, we've defined a vector
+;; of plans (one for each day).  Each individual plan contains the
+;; date when we're going to ride and a vector of activities. With this
+;; information, We can now obtain a diagram of the journey
 
 (clerk/with-viewer diagram/plan-viewer equally-split-plan)
 
-;; Each square in the diagram corresponds to one hour of ride.
-;; The color of the square displays the light conditiion at the time
-;; (this is why is importante to prodive a `:date` in the plan:
-;; rando-planner uses that, and the GPX route, to calculate when the
-;; Sun is setting in a particular place and time)
+;; Each square in the diagram corresponds to one hour of ride.  The
+;; color of the square displays the light conditiion at that time.
+;; This is why is importante to prodive a `:date` in the plan:
+;; rando-planner uses that, along with the GPX route, to calculate
+;; when the Sun is setting in a particular place and time.
+
+;; _(I am currently working to review the code responsible for this
+;; functionality and ensure its accuracy)_
 
 ;; The plan diagram looks fine, but we notice we didn't account the
 ;; time we'll spend having lunch. Let's make a new one:
 
+^{::clerk/visibility {:result :hide}}
 (def equally-split-plan-with-pauses
   {:gpx "gpx/be-prg.gpx"
    :average-speed average-speed
@@ -176,18 +181,19 @@ distance plans could be morale crushing."]])
 ;; - As a consequence of the two hours pauses, we're going to have to
 ;;   ride more time in the dark.
 
-;; Notice, also, that we can use the notebook to visually compare two
+;; Notice also that we can use the notebook to visually compare two
 ;; (or more) plans for the same route
 
-;; This plan looks promising, let's see on the map where the first day
-;; of riding will bring us. We're going to use the same viewer we used
-;; before, but since the plan is now more detailed, it will as well
-;; display more details
+;; The last plan we made looks promising, let's see on the map where
+;; the first day of riding will bring us. We're going to use the same
+;; viewer we used before, but since the plan is now more detailed, it
+;; will also display more information
 
 (clerk/with-viewer leaflet/leaflet-gpx-viewer equally-split-plan-with-pauses)
 
 ;; You can zoom in and use the markers to see where you'll land at the
 ;; end of the first day. Intermediate markers, when clicked, display a
 ;; popup that shows the label of the day that _ends_ there, and the
-;; amount of kilometers planned for that day. With this information
-;; you can use other tools and services to find an accomodation.
+;; amount of kilometers planned for that day. With this information,
+;; you can use other tools to find accomodation or other services
+;; you're going to need on the road.
