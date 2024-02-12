@@ -9,7 +9,7 @@
 ;; #### Custom viewers for [Clerk](https://github.com/nextjournal/clerk) for planning multi-day bike routes
 
 ^{:nextjournal.clerk/visibility {:code :hide}}
-(clerk/image "rando-planner-index.jpg")
+(clerk/image "rando-planner-index.png")
 
 ;; # [rando-planner](https://github.com/larsen/rando-planner) 🚲
 
@@ -27,9 +27,11 @@
 ;; - is based on Clerk, a notebook library for Clojure
 
 ;; Traditional tools (such as Komoot, Strava, Cycle.travel, etc.)
-;; focus on planning the route itself and, in some cases (like
-;; Komoot), offer extra tools to divide the route into multiple days,
-;; but they distribute distance uniformly across the days.
+;; focus on planning the route itself. Komoot offers an extra tool to
+;; divide the route into multiple days, but they distribute distance
+;; uniformly across the days. Cycle.travel allows to break down the
+;; route at arbitrary points (and helps finding accomodation for the
+;; night).
 
 ;; rando-planner provides different types of visualization that can be
 ;; used to study different strategies to cover the distance.
