@@ -41,7 +41,6 @@
                                             :endIconUrl "https://stefanorodighiero.net/misc/pin-icon-end.png"
                                             :shadowUrl "https://stefanorodighiero.net/misc/pin-shadow.png"}]
                         [:div {:id map-div-id
-                               :height "400px"
                                :style {:height "400px"}
                                :ref (fn [el]
                                       (if el
