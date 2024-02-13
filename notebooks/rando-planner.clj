@@ -20,7 +20,7 @@
 ;; visualization tools that help evaluating and comparing different
 ;; plans
 
-;; - assumes the user already have a GPX track defined (provided for
+;; - assumes the user already has a GPX track defined (provided for
 ;; example by the organizers of a bike event), and let the user plan
 ;; the daily effort to a higher granularity.
 
@@ -69,7 +69,7 @@
              [:h3 {:class "!text-black"} "⚠️ Important note"]
              [:span {:class "text-black"}
               "In general, it's not a good idea to strictly adhere to
-distance plans when preparing for bike journey.  rando-planner is
+distance plans when preparing for a bike journey.  rando-planner is
 intended as a tool to assist in studying different scenarios, and
 preparing for them as much as possible. However, unexpected events can
 occur, such as bad weather, road closures, or discovering a route you
@@ -144,21 +144,21 @@ be morale-crushing."]])
 ;; speed we intend to maintain. Additionally, we've defined a vector
 ;; of plans (one for each day).  Each individual plan contains the
 ;; date when we're going to ride and a vector of activities. With this
-;; information, We can now obtain a diagram of the journey
+;; information, We can now obtain a diagram of the journey:
 
 (clerk/with-viewer diagram/plan-viewer equally-split-plan)
 
 ;; Each square in the diagram corresponds to one hour of ride.  The
 ;; color of the square displays the light condition at that time.
-;; This is why is importante to prodive a `:date` in the plan:
+;; This is why is importante to provide a `:date` in the plan:
 ;; rando-planner uses that, along with the GPX route, to calculate
 ;; when the Sun is setting in a particular place and time.
 
 ;; _(I am currently working to review the code responsible for this
 ;; functionality and ensure its accuracy)_
 
-;; The plan diagram looks fine, but we notice we didn't account the
-;; time we'll spend having lunch. Let's make a new one:
+;; The plan diagram looks fine, but we notice we didn't plan any time to
+;; have lunch. Let's make a new plan:
 
 ^{::clerk/visibility {:result :hide}}
 (def equally-split-plan-with-pauses
@@ -184,14 +184,23 @@ be morale-crushing."]])
 ;;   ride more time in the dark.
 
 ;; Notice also that we can use the notebook to visually compare two
-;; (or more) plans for the same route
+;; (or more) plans for the same route. You can even put them side by
+;; side, thanks to Clerk facilities, with minimal extra work
+
+(merge
+ {:nextjournal/width :full}
+ (clerk/row
+  (clerk/col
+   (clerk/html [:h3 "Plan with no lunch!"])
+   (clerk/with-viewer diagram/plan-viewer equally-split-plan))
+  (clerk/col
+   (clerk/html [:h3 "Plan with a pause"])
+   (clerk/with-viewer diagram/plan-viewer equally-split-plan-with-pauses))))
 
 ;; The last plan we made looks promising, let's see on the map where
 ;; the first day of riding will bring us. We're going to use the same
 ;; viewer we used before, but since the plan is now more detailed, it
-;; will also display more information
-
-(clerk/with-viewer leaflet/leaflet-gpx-viewer equally-split-plan-with-pauses)
+;; will also display more information.
 
 ;; You can zoom in and use the markers to see where you'll land at the
 ;; end of the first day. Intermediate markers, when clicked, display a
@@ -199,3 +208,10 @@ be morale-crushing."]])
 ;; amount of kilometers planned for that day. With this information,
 ;; you can use other tools to find accomodation or other services
 ;; you're going to need on the road.
+
+;; Here the new map, this time displayed taking advantage of all the
+;; screen width:
+
+(merge
+ {:nextjournal/width :full}
+ (clerk/with-viewer leaflet/leaflet-gpx-viewer equally-split-plan-with-pauses))
