@@ -149,7 +149,7 @@ be morale-crushing."]])
 (clerk/with-viewer diagram/plan-viewer equally-split-plan)
 
 ;; Each square in the diagram corresponds to one hour of ride.  The
-;; color of the square displays the light conditiion at that time.
+;; color of the square displays the light condition at that time.
 ;; This is why is importante to prodive a `:date` in the plan:
 ;; rando-planner uses that, along with the GPX route, to calculate
 ;; when the Sun is setting in a particular place and time.
