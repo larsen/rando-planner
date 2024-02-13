@@ -3,8 +3,8 @@
     (:require [rando-planner.gpx :as gpx]
               [rando-planner.diagram :as diagram]
               [rando-planner.leaflet :as leaflet]
-              [nextjournal.clerk :as clerk]
-              [nextjournal.clerk.viewer :as v]))
+              [nextjournal.clerk :as clerk]))
+
 
 ;; #### Custom viewers for [Clerk](https://github.com/nextjournal/clerk) for planning multi-day bike routes
 
