@@ -122,7 +122,7 @@ be morale-crushing."]])
 
 (def average-speed 18)
 
-(/ (gpx/total-distance "gpx/be-prg.gpx")
+(/ (gpx/total-distance "gpx/be-rostock.gpx")
    average-speed)
 
 ;; So, probably something we can pull in two days. But how, exactly?
@@ -131,14 +131,14 @@ be morale-crushing."]])
 
 ^{::clerk/visibility {:result :hide}}
 (def equally-split-plan
-  {:gpx "gpx/be-prg.gpx"
+  {:gpx "gpx/be-rostock.gpx"
    :average-speed average-speed
    :daily-plans [{:date "2024-04-01"
                   :label "First day"
-                  :activities [{:start "08:00" :type :ride :length 10}]}
+                  :activities [{:start "10:00" :type :ride :length 8}]}
                  {:date "2024-04-02"
                   :label "Second day"
-                  :activities [{:start "08:00" :type :ride :length 10}]}]})
+                  :activities [{:start "10:00" :type :ride :length 6}]}]})
 
 ;; We've defined the GPX route we're going to use and the average
 ;; speed we intend to maintain. Additionally, we've defined a vector
@@ -150,7 +150,7 @@ be morale-crushing."]])
 
 ;; Each square in the diagram corresponds to one hour of ride.  The
 ;; color of the square displays the light condition at that time.
-;; This is why is importante to provide a `:date` in the plan:
+;; This is why it is important to provide a `:date` in the plan:
 ;; rando-planner uses that, along with the GPX route, to calculate
 ;; when the Sun is setting in a particular place and time.
 
@@ -166,12 +166,12 @@ be morale-crushing."]])
    :average-speed average-speed
    :daily-plans [{:date "2024-04-01"
                   :label "First day"
-                  :activities [{:start "08:00" :type :ride :length 5}
+                  :activities [{:start "10:00" :type :ride :length 3}
                                {:start "15:00" :type :ride :length 5}]}
                  {:date "2024-04-02"
                   :label "Second day"
-                  :activities [{:start "08:00" :type :ride :length 5}
-                               {:start "15:00" :type :ride :length 5}]}]})
+                  :activities [{:start "10:00" :type :ride :length 4}
+                               {:start "16:00" :type :ride :length 2}]}]})
 
 (clerk/with-viewer diagram/plan-viewer equally-split-plan-with-pauses)
 
