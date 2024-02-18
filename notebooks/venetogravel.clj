@@ -20,14 +20,7 @@
 
 ;; The route does not show particularly challenging climbs.
 
-(let [elevation (gpx/elevation gpx-resource)]
-  (clerk/html
-   [:svg {:width 600 :height 200}
-    (diagram/elevation-diagram {:elevation elevation
-                                :with-legend true
-                                :from 0
-                                :to 400
-                                :viewbox [0 0 600 200]})]))
+(clerk/with-viewer diagram/elevation-viewer {:gpx gpx-resource})
 
 ;; I think I can maintain an average speed of 20 km/h
 ;; (this quantity ought to be further decreased because of how
