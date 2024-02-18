@@ -111,6 +111,20 @@
              :fill "none"
              :d (points->path points)}]]))
 
+(def elevation-viewer
+  {:transform-fn (comp clerk/mark-presented
+                       (clerk/update-val
+                        #(clerk/html
+                          (let [elevation (gpx/elevation (:gpx %))
+                                total-distance (gpx/total-distance (:gpx %))
+                                viewbox [0 0 600 200]]
+                            [:svg {:width 600 :height 200}
+                             (elevation-diagram {:elevation elevation
+                                                 :with-legend true
+                                                 :from 0
+                                                 :to total-distance
+                                                 :viewbox viewbox})]))))})
+
 (defn pauses-diagram [{:keys [pauses]}]
   (loop [i 0
          pauses-diagram [:g]]
