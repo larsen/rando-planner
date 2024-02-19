@@ -76,7 +76,7 @@
 
 (defn points-at-daily-kilometers [plan]
   ;; TODO should use the gpx resource directly from plan
-  (let [points-wcd (gpx/points-with-cumulative-distance
+  (let [points-wcd (gpx/with-cumulative-distance
                     (gpx/points (:gpx plan)))
         daily-km-plans (butlast (daily-kilometers plan))
         points-at-end-of-days (for [dk daily-km-plans]

@@ -64,7 +64,7 @@
                                            (nth points (dec idx)) point))))
                points))
 
-(defn points-with-cumulative-distance [points]
+(defn with-cumulative-distance [points]
   (let [points-with-distance (points-with-distance points)
         cumulative-distances (reductions + 0 (map :distance points-with-distance))]
     (map-indexed (fn [idx point]
@@ -83,7 +83,7 @@
 (defn elevation [gpx-resource]
   (-> gpx-resource
       points
-      points-with-cumulative-distance
+      with-cumulative-distance
       group-by-kilometer))
 
 (defn total-distance [gpx-resource]
