@@ -184,21 +184,6 @@
                                                  :to total-distance
                                                  :viewbox viewbox})]))))})
 
-(clerk/with-viewer elevation-viewer
- {:description "Starting on April 19th"
-  :gpx "gpx/VG-2024_400k_lake_provvis.gpx"
-  :average-speed 20
-  :daily-plans [{:label "Day 1"
-                 :date "2024-04-19"
-                 :activities [{:start "15:00" :length 6 :type :ride}]}
-                {:label "Day 2"
-                 :date "2024-04-20"
-                 :activities [{:start "07:00" :length 5 :type :ride}
-                              {:start "17:00" :length 3 :type :ride}]}
-                {:label "Day 3"
-                 :date "2024-04-21"
-                 :activities [{:start "08:00" :length 6 :type :ride}]}]})
-
 (defn pauses-diagram [{:keys [pauses]}]
   (loop [i 0
          pauses-diagram [:g]]
