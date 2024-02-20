@@ -100,7 +100,6 @@
                        {:x to :y min-elevation
                         :pointspace pointspace
                         :viewbox viewbox})]
-    (reset-alternating-background!)
     [:g
      (when with-legend
        [:g
@@ -125,6 +124,7 @@
                 :fill (get-from-palette :elevation-legend-stroke)}
          (str max-elevation)]])
      (when daily-kilometers
+       (reset-alternating-background!)
        (for [d daily-kilometers]
          (let [{dx1 :x} (pointspace-to-viewbox-space
                          {:x (:covered d)
