@@ -81,20 +81,21 @@
          partitions)))
 
 (defn with-elevation-gain [points]
-  (map-indexed (fn [idx point]
-                 (assoc point :elevation-gain
-                        (if (zero? idx)
-                          0
-                          (- (:elevation (nth points idx))
-                             (:elevation (nth points (- idx 1)))))))
-               points))
+  (let [couples (vec (map vector points (rest points)))]
+    (map (fn [[p1 p2]]
+           (assoc p1 :elevation-gain
+                  (if p2
+                    (- (:elevation p2)
+                       (:elevation p1))
+                    0)))
+         couples)))
 
 (defn elevation-gain [points-with-elevation-gain from to]
-  (reduce + (sequence (->> points-with-elevation-gain
-                           (filter #(and (>= (:kilometer %) from)
-                                         (< (:kilometer %) to)
-                                         (> (:elevation-gain %) 0)))
-                           (map :elevation-gain)))))
+  (reduce + (->> points-with-elevation-gain
+                 (filter #(and (>= (:kilometer %) from)
+                               (< (:kilometer %) to)
+                               (> (:elevation-gain %) 0)))
+                 (map :elevation-gain))))
 
 (defn elevation [gpx-resource]
   (-> gpx-resource
