@@ -58,7 +58,8 @@
   "Given a plan, it returns a vector of structures containing how many
   kilometers are done in each day, and from what kilometer each day starts"
   [plan]
-  (let [daily-plans (:daily-plans plan)]
+  (let [daily-plans (:daily-plans plan)
+        elevation (gpx/elevation  (:gpx plan))]
     (loop [result []
            acc-km 0
            i 0]
@@ -69,15 +70,18 @@
                        {:day (+ 1 i)
                         :label (:label (nth daily-plans i))
                         :kilometers km
-                        :covered acc-km})
+                        :covered acc-km
+                        :elevation (gpx/elevation-gain elevation
+                                                       acc-km
+                                                       (+ km acc-km))})
                  (+ acc-km km)
                  (inc i)))
         result))))
 
 (defn points-at-daily-kilometers [plan]
-  ;; TODO should use the gpx resource directly from plan
-  (let [points-wcd (gpx/points-with-cumulative-distance
-                    (gpx/points (:gpx plan)))
+  (let [points-wcd (-> (:gpx plan)
+                       gpx/points
+                       gpx/with-cumulative-distance)
         daily-km-plans (butlast (daily-kilometers plan))
         points-at-end-of-days (for [dk daily-km-plans]
                                 (first (filter (fn [p]

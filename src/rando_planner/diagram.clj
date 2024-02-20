@@ -55,6 +55,8 @@
    :elevation-trend "darkgreen"
    :elevation-legend-stroke "black"
    :elevation-legend-text "black"
+   :day-background1 "#eeeeff"
+   :day-background2 "#ddddee"
    :pause-marker "green"
    :pause-text "darkgreen"
    :light-text "#0d3d56" ; Indigo
@@ -66,7 +68,22 @@
 (defn get-from-palette [element]
   (get palette element "pink"))
 
-(defn elevation-diagram [{:keys [elevation from to viewbox with-legend]}]
+(def alternating-background (atom :day-background1))
+
+(defn reset-alternating-background! []
+  (reset! alternating-background :day-background1))
+
+(defn get-alternating-background! []
+  (get-from-palette
+   (swap! alternating-background
+          (fn [bkg]
+            (if (= :day-background1 bkg)
+              :day-background2
+              :day-background1)))))
+
+(defn elevation-diagram [{:keys [elevation from to
+                                 daily-kilometers
+                                 viewbox with-legend]}]
   (let [selected-elevation (filter (fn [{x :kilometer}]
                                      (and (>= x from)
                                           (< x to)))
@@ -94,18 +111,59 @@
         [:line {:x1 x1 :y1 y2 :x2 (- x1 5) :y2 y2
                 :stroke (get-from-palette :elevation-legend-stroke)}]
         [:text {:x (- x1 15)
-                :y y2
+                :y (- y2 2)
                 :font-family "Fira Sans"
-                :font-size "50%"
+                :font-size "60%"
                 :fill (get-from-palette :elevation-legend-text)}
          (str min-elevation)]
         [:text {:x (- x1 35)
-                :y 0
+                :y 2
                 :font-family "Fira Sans"
-                :font-size "50%"
+                :font-size "60%"
                 :dominant-baseline "hanging"
                 :fill (get-from-palette :elevation-legend-stroke)}
          (str max-elevation)]])
+     (when daily-kilometers
+       (reset-alternating-background!)
+       (for [d daily-kilometers]
+         (let [{dx1 :x} (pointspace-to-viewbox-space
+                         {:x (:covered d)
+                          :y 0
+                          :pointspace pointspace
+                          :viewbox viewbox})
+               {dx2 :x} (pointspace-to-viewbox-space
+                         {:x (:kilometers d)
+                          :y 0
+                          :pointspace pointspace
+                          :viewbox viewbox})]
+           [:g
+            [:text {:x (+ dx1 2)
+                    :y 2
+                    :font-family "Fira Sans"
+                    :font-size "60%"
+                    :font-weight "bold"
+                    :dominant-baseline "hanging"
+                    :fill (get-from-palette :elevation-legend-stroke)}
+             (str (:label d))]
+            [:text {:x (+ dx1 2)
+                    :y 15
+                    :font-family "Fira Sans"
+                    :font-size "60%"
+                    :dominant-baseline "hanging"
+                    :fill (get-from-palette :elevation-legend-stroke)}
+             (str "↔ " (:kilometers d) " km")]
+            [:text {:x (+ dx1 2)
+                    :y 27
+                    :font-family "Fira Sans"
+                    :font-size "60%"
+                    :dominant-baseline "hanging"
+                    :fill (get-from-palette :elevation-legend-stroke)}
+             (str "▲ " (:elevation d) " m")]
+            [:rect {:x dx1
+                    :y 0
+                    :width dx2 :height y2
+                    :fill (get-alternating-background!)
+                    :fill-opacity 0.4}]])))
      [:path {:stroke (get-from-palette :elevation-trend)
              :stroke-width 1
              :fill "none"
@@ -120,6 +178,7 @@
                                 viewbox [0 0 600 200]]
                             [:svg {:width 600 :height 200}
                              (elevation-diagram {:elevation elevation
+                                                 :daily-kilometers (plan/daily-kilometers %)
                                                  :with-legend true
                                                  :from 0
                                                  :to total-distance
@@ -211,7 +270,12 @@
                    :font-family "Fira Sans"
                    :font-size ".28em"
                    :dominant-baseline "middle"}
-            (str "~" total-km-for-day " km")]
+            (str "🚲 ~" total-km-for-day " km")]
+           [:text {:x 0 :y 29
+                   :font-family "Fira Sans"
+                   :font-size ".28em"
+                   :dominant-baseline "middle"}
+            (str "▴ ~" (gpx/elevation-gain elevation km (+ km total-km-for-day)) " m")]
            [:g {:transform (str "translate(" (+ left-margin
                                                 main-offset) " 0)")}
             (elevation-diagram {:elevation elevation

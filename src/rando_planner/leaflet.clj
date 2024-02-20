@@ -63,6 +63,8 @@
                                                     "<strong>" (:label pp) "</strong>"
                                                     "<br />"
                                                     (.floor js/Math (:kilometers pp))
-                                                    " km / Cumulative "
+                                                    " km / ("
                                                     (.floor js/Math (:cumulative-distance pp))
-                                                    " km </small>")))))))}]))]))})
+                                                    " km) ▲ "
+                                                    (.floor js/Math (:elevation pp))
+                                                    "</small>")))))))}]))]))})

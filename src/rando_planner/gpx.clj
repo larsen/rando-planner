@@ -64,7 +64,7 @@
                                            (nth points (dec idx)) point))))
                points))
 
-(defn points-with-cumulative-distance [points]
+(defn with-cumulative-distance [points]
   (let [points-with-distance (points-with-distance points)
         cumulative-distances (reductions + 0 (map :distance points-with-distance))]
     (map-indexed (fn [idx point]
@@ -80,11 +80,30 @@
             :elevation (apply max (map :ele partition))})
          partitions)))
 
+(defn with-elevation-gain [points]
+  (let [couples (vec (map vector points (rest points)))]
+    (map (fn [[p1 p2]]
+           (assoc p1 :elevation-gain
+                  (if p2
+                    (- (:elevation p2)
+                       (:elevation p1))
+                    0)))
+         couples)))
+
+(defn elevation-gain [points-with-elevation-gain from to]
+  (reduce + (->> points-with-elevation-gain
+                 (filter #(and (>= (:kilometer %) from)
+                               (< (:kilometer %) to)
+                               (> (:elevation-gain %) 0)))
+                 (map :elevation-gain))))
+
+;; TODO it is not clear this function returns a list of points
 (defn elevation [gpx-resource]
   (-> gpx-resource
       points
-      points-with-cumulative-distance
-      group-by-kilometer))
+      with-cumulative-distance
+      group-by-kilometer
+      with-elevation-gain))
 
 (defn total-distance [gpx-resource]
   (->> (points gpx-resource)
