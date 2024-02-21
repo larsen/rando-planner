@@ -17,7 +17,7 @@
 (defn add-plan-markers [plan]
   (if (and (:gpx plan)
            (:daily-plans plan))
-    (assoc plan :markers (butlast (plan/points-at-daily-kilometers plan)))
+    (assoc plan :markers (butlast (plan/daily-stats plan)))
     plan))
 
 (defn enrich-with-gpx-details [value]

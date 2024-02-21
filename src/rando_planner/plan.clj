@@ -54,7 +54,7 @@
                  (rest next-activities)))
         p))))
 
-(defn daily-kilometers
+(defn daily-distance
   "Given a plan, it returns a vector of structures containing how many
   kilometers are done in each day, and from what kilometer each day starts"
   [plan]
@@ -78,7 +78,7 @@
                  (inc i)))
         result))))
 
-(defn points-at-daily-kilometers
+(defn daily-stats
   "Given a plan, it returns a list of dictionaries with info and
   statistics for each day in the plan, including:
 
@@ -96,7 +96,7 @@
   (let [points-wcd (-> (:gpx plan)
                        gpx/points
                        gpx/with-cumulative-distance)
-        daily-km-plans (daily-kilometers plan)
+        daily-km-plans (daily-distance plan)
         points-at-end-of-days (for [dk daily-km-plans]
                                 (first (filter (fn [p]
                                                  (> (:cumulative-distance p)

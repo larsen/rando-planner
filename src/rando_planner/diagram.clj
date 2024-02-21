@@ -178,7 +178,7 @@
                                 viewbox [0 0 600 200]]
                             [:svg {:width 600 :height 200}
                              (elevation-diagram {:elevation elevation
-                                                 :daily-kilometers (plan/daily-kilometers %)
+                                                 :daily-kilometers (plan/daily-distance %)
                                                  :with-legend true
                                                  :from 0
                                                  :to total-distance
