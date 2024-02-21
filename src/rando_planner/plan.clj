@@ -78,11 +78,36 @@
                  (inc i)))
         result))))
 
-(defn points-at-daily-kilometers [plan]
+:day
+:cumulative-distance
+:elevation
+:ele
+:label
+:lon
+:lat
+:distance
+:covered
+:kilometers
+
+(defn points-at-daily-kilometers
+  "Given a plan, it returns a list of dictionaries with info and
+  statistics for each day in the plan, including:
+
+  :day
+  :cumulative-distance
+  :elevation
+  :ele
+  :label
+  :lon
+  :lat
+  :distance
+  :covered
+  :kilometers"
+  [plan]
   (let [points-wcd (-> (:gpx plan)
                        gpx/points
                        gpx/with-cumulative-distance)
-        daily-km-plans (butlast (daily-kilometers plan))
+        daily-km-plans (daily-kilometers plan)
         points-at-end-of-days (for [dk daily-km-plans]
                                 (first (filter (fn [p]
                                                  (> (:cumulative-distance p)
