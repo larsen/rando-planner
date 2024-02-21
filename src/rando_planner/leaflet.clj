@@ -35,6 +35,7 @@
                                "leaflet-gpx@1.5.1/gpx.min.js"]}
                     (fn [leaflet]
                       (let [map-div-id (str (gensym))
+                            m (atom nil)
                             attribution "&copy; <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a>"
                             marker-options {:startIconUrl "https://stefanorodighiero.net/misc/pin-icon-start.png"
                                             :endIconUrl "https://stefanorodighiero.net/misc/pin-icon-end.png"
@@ -43,22 +44,22 @@
                                :height "400px"
                                :style {:height "400px"}
                                :ref (fn [el]
-                                      (when el
-                                        (let [m (.map js/L map-div-id)
-                                              tile-layer (.tileLayer js/L "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                      (if el
+                                        (let [tile-layer (.tileLayer js/L "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
                                                                      (clj->js {:attribution attribution}))
                                               gpx-layer (new js/L.GPX (:gpx-content value)
                                                              (clj->js {:async true
                                                                        :marker_options marker-options}))]
+                                          (reset! m (.map js/L map-div-id))
                                           (if (:bounds value)
-                                            (.fitBounds m (clj->js (:bounds value)))
-                                            (.setView m (clj->js (:center value)) (:zoom value)))
-                                          (.addTo tile-layer m)
-                                          (.addTo gpx-layer m)
+                                            (.fitBounds @m (clj->js (:bounds value)))
+                                            (.setView @m (clj->js (:center value)) (:zoom value)))
+                                          (.addTo tile-layer @m)
+                                          (.addTo gpx-layer @m)
                                           (when (:markers value)
                                             (doseq [pp (:markers value)]
                                               (.bindPopup
-                                               (.addTo (.marker js/L (clj->js [(:lat pp) (:lon pp)])) m)
+                                               (.addTo (.marker js/L (clj->js [(:lat pp) (:lon pp)])) @m)
                                                (str "<small>"
                                                     "<strong>" (:label pp) "</strong>"
                                                     "<br />"
@@ -67,4 +68,5 @@
                                                     (.floor js/Math (:cumulative-distance pp))
                                                     " km) ▲ "
                                                     (.floor js/Math (:elevation pp))
-                                                    "</small>")))))))}]))]))})
+                                                    "</small>")))))
+                                        (.remove @m)))}]))]))})
