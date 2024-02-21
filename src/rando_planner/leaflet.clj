@@ -69,7 +69,4 @@
                                                     " km) ▲ "
                                                     (.floor js/Math (:elevation pp))
                                                     "</small>")))))
-                                        (do
-                                          (.log js/console "here!")
-                                          (.log js/console @m)
-                                          (.remove @m))))}]))]))})
+                                        (.remove @m)))}]))]))})
