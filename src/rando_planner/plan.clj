@@ -78,17 +78,6 @@
                  (inc i)))
         result))))
 
-:day
-:cumulative-distance
-:elevation
-:ele
-:label
-:lon
-:lat
-:distance
-:covered
-:kilometers
-
 (defn points-at-daily-kilometers
   "Given a plan, it returns a list of dictionaries with info and
   statistics for each day in the plan, including:
