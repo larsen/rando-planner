@@ -270,7 +270,7 @@
                    :font-family "Fira Sans"
                    :font-size ".28em"
                    :dominant-baseline "middle"}
-            (str "🚲 ~" total-km-for-day " km")]
+            (str "↔ ~" total-km-for-day " km")]
            [:text {:x 0 :y 29
                    :font-family "Fira Sans"
                    :font-size ".28em"
