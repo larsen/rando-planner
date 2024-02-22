@@ -158,7 +158,7 @@
                     :font-size "60%"
                     :dominant-baseline "hanging"
                     :fill (get-from-palette :elevation-legend-stroke)}
-             (str "▲ " (:elevation d) " m")]
+             (str "▲ " (Math/floor (:elevation d)) " m")]
             [:rect {:x dx1
                     :y 0
                     :width dx2 :height y2
@@ -275,7 +275,9 @@
                    :font-family "Fira Sans"
                    :font-size ".28em"
                    :dominant-baseline "middle"}
-            (str "▴ ~" (gpx/elevation-gain elevation km (+ km total-km-for-day)) " m")]
+            (str "▴ ~" (Math/floor
+                        (gpx/elevation-gain
+                         elevation km (+ km total-km-for-day))) " m")]
            [:g {:transform (str "translate(" (+ left-margin
                                                 main-offset) " 0)")}
             (elevation-diagram {:elevation elevation
