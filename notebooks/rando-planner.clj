@@ -64,6 +64,9 @@
 ;; tool, but now you want to study different ways to cover the
 ;; distance over multiple days.
 
+;; (you can download the route I'm using for this example
+;; from [here](https://stefanorodighiero.net/misc/be-rostock.gpx))
+
 ^{:nextjournal.clerk/visibility {:code :hide}}
 (clerk/html [:div {:class "bg-amber-100 p-2"}
              [:h3 {:class "!text-black"} "⚠️ Important note"]
@@ -130,7 +133,7 @@ be morale-crushing."]])
                   :activities [{:start "10:00" :type :ride :length 8}]}
                  {:date "2024-04-02"
                   :label "Second day"
-                  :activities [{:start "10:00" :type :ride :length 6}]}]})
+                  :activities [{:start "10:00" :type :ride :length 6.5}]}]})
 
 ;; We've defined the GPX route we're going to use and the average
 ;; speed we intend to maintain. Additionally, we've defined a vector
@@ -163,7 +166,7 @@ be morale-crushing."]])
                  {:date "2024-04-02"
                   :label "Second day"
                   :activities [{:start "10:00" :type :ride :length 4}
-                               {:start "16:00" :type :ride :length 2}]}]})
+                               {:start "16:00" :type :ride :length 2.5}]}]})
 
 (clerk/with-viewer diagram/plan-viewer equally-split-plan-with-pauses)
 
