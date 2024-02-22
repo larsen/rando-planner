@@ -275,7 +275,9 @@
                    :font-family "Fira Sans"
                    :font-size ".28em"
                    :dominant-baseline "middle"}
-            (str "▴ ~" (gpx/elevation-gain elevation km (+ km total-km-for-day)) " m")]
+            (str "▴ ~" (Math/floor
+                        (gpx/elevation-gain
+                         elevation km (+ km total-km-for-day))) " m")]
            [:g {:transform (str "translate(" (+ left-margin
                                                 main-offset) " 0)")}
             (elevation-diagram {:elevation elevation
