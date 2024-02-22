@@ -158,7 +158,7 @@
                     :font-size "60%"
                     :dominant-baseline "hanging"
                     :fill (get-from-palette :elevation-legend-stroke)}
-             (str "▲ " (:elevation d) " m")]
+             (str "▲ " (Math/floor (:elevation d)) " m")]
             [:rect {:x dx1
                     :y 0
                     :width dx2 :height y2
