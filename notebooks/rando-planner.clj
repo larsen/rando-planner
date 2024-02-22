@@ -215,3 +215,42 @@ be morale-crushing."]])
 (merge
  {:nextjournal/width :full}
  (clerk/with-viewer leaflet/leaflet-gpx-viewer equally-split-plan-with-pauses))
+
+;; ## How plans are defined
+
+;; Examining an example, we'll provide a more formal definition of
+;; each option that can be specified:
+
+^{:nextjournal.clerk/visibility {:code :hide}}
+(clerk/code {:gpx "gpx/be-rostock.gpx"
+             :average-speed average-speed
+             :daily-plans [{:date "2024-04-01"
+                            :label "First day"
+                            :activities [{:start "10:00" :type :ride :length 3}
+                                         {:start "15:00" :type :ride :length 5}]}
+                           {:date "2024-04-02"
+                            :label "Second day"
+                            :activities [{:start "10:00" :type :ride :length 4}
+                                         {:start "16:00" :type :ride :length 2.5}]}]})
+
+;; A plan is defined as a dictionary containing the following keys:
+
+;; - `:gpx`: This key refers to the location of a GPX (GPS Exchange
+;;   Format) file
+
+;; - `:average-speed`: This key represents the average speed
+;;   maintained during the activities. The value associated with this
+;;   key is expected to be a numerical value denoting speed, expressed
+;;   as km/h
+
+;; - `:daily-plans`: This key holds a vector of daily plans. Each
+;;   daily plan is represented as a map containing information about
+;;   activities planned for a single day. Inside each element in the
+;;   vector:
+
+;;   - `:date`: This key denotes the date of the daily plan in the format "YYYY-MM-DD". It is used to compute the sun rise and set times.
+;;   - `:label`: An arbitrary string, a label or description of the daily plan
+;;   - `:activities`: This key holds a vector of activities planned for the day. Each activity is represented as a map containing:
+;;     - `:start`: This key denotes the starting time of an activity, in the format "HH:mm"
+;;     - `:type`: This key specifies the type of activity. At the moment only the type "ride" is in use. This key is reserved for future uses
+;;     - `:length`: This key represents the duration or length of the activity, expressed in hours. It is expected to be a numerical value.
