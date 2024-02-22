@@ -106,15 +106,7 @@ be morale-crushing."]])
 ;; Distance alone is not enough to get an idea of the effort. Let's
 ;; have a look at the elevation
 
-(let [elevation (gpx/elevation "gpx/be-rostock.gpx")]
-  (clerk/html
-   [:svg {:width 600 :height 200}
-    (diagram/elevation-diagram {:elevation elevation
-                                :with-legend true
-                                :from 0
-                                :to (gpx/total-distance "gpx/be-rostock.gpx")
-                                :viewbox [0 0 600 200]})]))
-
+(clerk/with-viewer diagram/elevation-viewer {:gpx "gpx/be-rostock.gpx"})
 
 ;; Let's say we feel like we can maintain an
 ;; average speed of 18 km/h throughout the entire journey.
@@ -182,6 +174,11 @@ be morale-crushing."]])
 
 ;; - As a consequence of the two hours pauses, we're going to have to
 ;;   ride more time in the dark.
+
+;; Now that the plan is fleshed out, we can obtain more information
+;; from the elevation viewer
+
+(clerk/with-viewer diagram/elevation-viewer equally-split-plan-with-pauses)
 
 ;; Notice also that we can use the notebook to visually compare two
 ;; (or more) plans for the same route. You can even put them side by
