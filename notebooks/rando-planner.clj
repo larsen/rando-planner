@@ -154,7 +154,7 @@ be morale-crushing."]])
 
 ^{::clerk/visibility {:result :hide}}
 (def equally-split-plan-with-pauses
-  {:gpx "gpx/be-prg.gpx"
+  {:gpx "gpx/be-rostock.gpx"
    :average-speed average-speed
    :daily-plans [{:date "2024-04-01"
                   :label "First day"
