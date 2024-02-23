@@ -176,7 +176,9 @@
                           (let [elevation (gpx/elevation (:gpx %))
                                 total-distance (gpx/total-distance (:gpx %))
                                 viewbox [0 0 600 200]]
-                            [:svg {:width 600 :height 200}
+                            [:svg {:width 600
+                                   :height 200
+                                   :style {:background-color (get-from-palette :background)}}
                              (elevation-diagram {:elevation elevation
                                                  :daily-kilometers (plan/daily-distance %)
                                                  :with-legend true
@@ -365,7 +367,8 @@
         average-speed (:average-speed plan)]
     [:svg {:width diagram-width
            :height diagram-height
-           :viewBox "0 0 300 230"}
+           :viewBox "0 0 300 230"
+           :style {:background-color (get-from-palette :background)}}
      (plan-title (:description plan))
      [:g {:transform "translate(0 25)"}
       (plan-main-kilometers-svg total-distance
