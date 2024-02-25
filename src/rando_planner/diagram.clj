@@ -52,6 +52,7 @@
 
 (def palette
   {:background "white"
+   :text-color "black"
    :elevation-trend "darkgreen"
    :elevation-legend-stroke "black"
    :elevation-legend-text "black"
@@ -86,8 +87,7 @@
                                  viewbox with-legend]}]
   (let [elevation (gpx/elevation (:gpx plan))
         average-speed (:average-speed plan)
-        daily-pauses (map plan/pauses (:daily-plans plan))
-        daily-kilometers (plan/daily-distance plan)
+        daily-stats (plan/daily-stats plan)
         selected-elevation (filter (fn [{x :kilometer}]
                                      (and (>= x from)
                                           (< x to)))
@@ -128,9 +128,9 @@
                 :fill (get-from-palette :elevation-legend-stroke)}
          (str max-elevation)]])
      ;; TODO I should have finer control here
-     (when (and with-legend daily-kilometers)
+     (when (and with-legend daily-stats)
        (reset-alternating-background!)
-       (for [d daily-kilometers]
+       (for [d daily-stats]
          (let [{dx1 :x} (pointspace-to-viewbox-space
                          {:x (:covered d)
                           :y 0
@@ -168,7 +168,19 @@
                     :y 0
                     :width dx2 :height y2
                     :fill (get-alternating-background!)
-                    :fill-opacity 0.4}]])))
+                    :fill-opacity 0.4}]
+            (when (:pauses d)
+              (for [p (:pauses d)]
+                (let [{px :x} (pointspace-to-viewbox-space
+                               {:x (+ (:covered d)
+                                      (* (:average-speed plan)
+                                         (:after p)))
+                                :y 10
+                                :pointspace pointspace
+                                :viewbox viewbox})]
+                  [:line {:x1 px :y1 0 :x2 px :y2 200
+                          :stroke (get-from-palette :elevation-legend-stroke)
+                          :stroke-dasharray "4 2"}])))])))
      [:path {:stroke (get-from-palette :elevation-trend)
              :stroke-width 1
              :fill "none"
