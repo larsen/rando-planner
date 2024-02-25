@@ -181,9 +181,20 @@
                                 :y 0  ; not important, not used
                                 :pointspace pointspace
                                 :viewbox viewbox})]
-                  [:line {:x1 px :y1 0 :x2 px :y2 bottom-right-y
-                          :stroke (get-from-palette :elevation-legend-stroke)
-                          :stroke-dasharray "4 2"}])))])))
+                  [:g
+                   [:line {:x1 px :y1 0 :x2 px :y2 bottom-right-y
+                           :stroke (get-from-palette :elevation-legend-stroke)
+                           :stroke-dasharray "4 2"}]
+                   [:rect {:x (- px 10) :y (- bottom-right-y 12)
+                           :width 20 :height 12
+                           :fill (get-from-palette :pause-marker)}]
+                   [:text {:x px :y (- bottom-right-y 2)
+                           :text-anchor "middle"
+                           :font-weight "bold"
+                           :font-family "Fira Sans"
+                           :font-size "55%"
+                           :fill (get-from-palette :dark-text)}
+                    (str (:length p) "h")]])))])))
      [:path {:stroke (get-from-palette :elevation-trend)
              :stroke-width 1
              :fill "none"
