@@ -96,31 +96,34 @@
         max-elevation (reduce max (map :elevation elevation))
         pointspace [from to min-elevation max-elevation]
         points (points-in-viewbox-space selected-elevation pointspace viewbox)
-        {x1 :x y1 :y} (pointspace-to-viewbox-space
-                       {:x to :y max-elevation
-                        :pointspace pointspace
-                        :viewbox viewbox})
-        {x2 :x y2 :y} (pointspace-to-viewbox-space
+        {up-right-x :x up-right-y :y} (pointspace-to-viewbox-space
+                                       {:x to :y max-elevation
+                                        :pointspace pointspace
+                                        :viewbox viewbox})
+        {bottom-right-x :x bottom-right-y :y} (pointspace-to-viewbox-space
                        {:x to :y min-elevation
                         :pointspace pointspace
                         :viewbox viewbox})]
     [:g
      (when with-legend
        [:g
-        [:line {:x1 x1 :y1 y1 :x2 x2 :y2 y2
+        [:line {:x1 up-right-x :y1 up-right-y
+                :x2 bottom-right-x :y2 bottom-right-y
                 :stroke (get-from-palette :elevation-legend-stroke)}]
         ;; Ticks
-        [:line {:x1 x1 :y1 y1 :x2 (- x1 5) :y2 y1
+        [:line {:x1 up-right-x :y1 up-right-y
+                :x2 (- up-right-x 5) :y2 up-right-y
                 :stroke (get-from-palette :elevation-legend-stroke)}]
-        [:line {:x1 x1 :y1 y2 :x2 (- x1 5) :y2 y2
+        [:line {:x1 up-right-x :y1 bottom-right-y
+                :x2 (- up-right-x 5) :y2 bottom-right-y
                 :stroke (get-from-palette :elevation-legend-stroke)}]
-        [:text {:x (- x1 15)
-                :y (- y2 2)
+        [:text {:x (- up-right-x 15)
+                :y (- bottom-right-y 2)
                 :font-family "Fira Sans"
                 :font-size "60%"
                 :fill (get-from-palette :elevation-legend-text)}
          (str min-elevation)]
-        [:text {:x (- x1 35)
+        [:text {:x (- up-right-x 35)
                 :y 2
                 :font-family "Fira Sans"
                 :font-size "60%"
@@ -166,7 +169,7 @@
              (str "▲ " (Math/floor (:elevation d)) " m")]
             [:rect {:x dx1
                     :y 0
-                    :width dx2 :height y2
+                    :width dx2 :height bottom-right-y
                     :fill (get-alternating-background!)
                     :fill-opacity 0.4}]
             (when (:pauses d)
