@@ -178,10 +178,10 @@
                                {:x (+ (:covered d)
                                       (* (:average-speed plan)
                                          (:after p)))
-                                :y 10
+                                :y 0  ; not important, not used
                                 :pointspace pointspace
                                 :viewbox viewbox})]
-                  [:line {:x1 px :y1 0 :x2 px :y2 200
+                  [:line {:x1 px :y1 0 :x2 px :y2 bottom-right-y
                           :stroke (get-from-palette :elevation-legend-stroke)
                           :stroke-dasharray "4 2"}])))])))
      [:path {:stroke (get-from-palette :elevation-trend)
