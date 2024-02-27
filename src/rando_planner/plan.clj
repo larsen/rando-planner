@@ -102,12 +102,12 @@
                                                  (> (:cumulative-distance p)
                                                     (+ (:covered dk)
                                                        (:kilometers dk))))
-                                               points-with-cumulative-distance)))]
+                                               points-with-cumulative-distance)))
+        daily-pauses (vec (map
+                           (fn [pauses]
+                             {:pauses pauses})
+                           (map pauses (:daily-plans plan))))]
     (map merge
          points-at-end-of-days
          daily-distance
-         ;; TODO refactor?
-         (vec (map
-               (fn [pauses]
-                 {:pauses pauses})
-               (map pauses (:daily-plans plan)))))))
+         daily-pauses)))
