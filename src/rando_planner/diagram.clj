@@ -46,9 +46,6 @@
 (def left-margin 50)
 (def diagram-width 600)
 (def diagram-height 450)
-(def viewbox-dimensions [0 0 diagram-width diagram-height])
-(def viewbox-dimensions-as-str
-  (viewbox-dimensions-to-str viewbox-dimensions))
 
 (def palette
   {:background "white"
@@ -63,8 +60,7 @@
    :light-text "#0d3d56" ; Indigo
    :light-fill "#43abc9"
    :dark-text "white"
-   :dark-fill "#0d3d56"
-   })
+   :dark-fill "#0d3d56"})
 
 (defn get-from-palette [element]
   (get palette element "pink"))
@@ -101,9 +97,9 @@
                                         :pointspace pointspace
                                         :viewbox viewbox})
         {bottom-right-x :x bottom-right-y :y} (pointspace-to-viewbox-space
-                       {:x to :y min-elevation
-                        :pointspace pointspace
-                        :viewbox viewbox})]
+                                               {:x to :y min-elevation
+                                                :pointspace pointspace
+                                                :viewbox viewbox})]
     [:g
      (when with-legend
        [:g
@@ -176,7 +172,7 @@
               (for [p (:pauses d)]
                 (let [{px :x} (pointspace-to-viewbox-space
                                {:x (+ (:covered d)
-                                      (* (:average-speed plan)
+                                      (* average-speed
                                          (:after p)))
                                 :y 0  ; not important, not used
                                 :pointspace pointspace
@@ -283,8 +279,7 @@
                  :fill (get-from-palette
                         (if (or before-sunrise? after-sunset?)
                           :dark-text
-                          :light-text
-                          ))}
+                          :light-text))}
           (str (+ kilometers (* average-speed (+ 1 n))))]]))))
 
 (defn day-plan->svg [plan index km center]
@@ -361,7 +356,7 @@
            :font-size ".5em"}
     description]])
 
-(defn plan-main-kilometers-svg [total-distance average-speed elevation]
+(defn plan-main-kilometers-svg [total-distance average-speed]
   (into [:svg]
         [:g
          (loop [i 0
@@ -394,7 +389,6 @@
 
 (defn plan-diagram [plan]
   (let [total-distance (gpx/total-distance (:gpx plan))
-        elevation (gpx/elevation (:gpx plan))
         center (gpx/center (gpx/points (:gpx plan)))
         average-speed (:average-speed plan)]
     [:svg {:width diagram-width
@@ -404,8 +398,7 @@
      (plan-title (:description plan))
      [:g {:transform "translate(0 25)"}
       (plan-main-kilometers-svg total-distance
-                                average-speed
-                                elevation)]
+                                average-speed)]
      (loop [index 0
             total-kilometers-covered 0
             output [:g]]
