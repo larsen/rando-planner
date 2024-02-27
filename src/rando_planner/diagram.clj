@@ -52,6 +52,7 @@
 
 (def palette
   {:background "white"
+   :text-color "black"
    :elevation-trend "darkgreen"
    :elevation-legend-stroke "black"
    :elevation-legend-text "black"
@@ -81,10 +82,13 @@
               :day-background2
               :day-background1)))))
 
-(defn elevation-diagram [{:keys [elevation from to
-                                 daily-kilometers
+(defn elevation-diagram [{:keys [plan
+                                 from to
                                  viewbox with-legend]}]
-  (let [selected-elevation (filter (fn [{x :kilometer}]
+  (let [elevation (gpx/elevation (:gpx plan))
+        average-speed (:average-speed plan)
+        daily-stats (plan/daily-stats plan)
+        selected-elevation (filter (fn [{x :kilometer}]
                                      (and (>= x from)
                                           (< x to)))
                                    elevation)
@@ -92,40 +96,44 @@
         max-elevation (reduce max (map :elevation elevation))
         pointspace [from to min-elevation max-elevation]
         points (points-in-viewbox-space selected-elevation pointspace viewbox)
-        {x1 :x y1 :y} (pointspace-to-viewbox-space
-                       {:x to :y max-elevation
-                        :pointspace pointspace
-                        :viewbox viewbox})
-        {x2 :x y2 :y} (pointspace-to-viewbox-space
+        {up-right-x :x up-right-y :y} (pointspace-to-viewbox-space
+                                       {:x to :y max-elevation
+                                        :pointspace pointspace
+                                        :viewbox viewbox})
+        {bottom-right-x :x bottom-right-y :y} (pointspace-to-viewbox-space
                        {:x to :y min-elevation
                         :pointspace pointspace
                         :viewbox viewbox})]
     [:g
      (when with-legend
        [:g
-        [:line {:x1 x1 :y1 y1 :x2 x2 :y2 y2
+        [:line {:x1 up-right-x :y1 up-right-y
+                :x2 bottom-right-x :y2 bottom-right-y
                 :stroke (get-from-palette :elevation-legend-stroke)}]
         ;; Ticks
-        [:line {:x1 x1 :y1 y1 :x2 (- x1 5) :y2 y1
+        [:line {:x1 up-right-x :y1 up-right-y
+                :x2 (- up-right-x 5) :y2 up-right-y
                 :stroke (get-from-palette :elevation-legend-stroke)}]
-        [:line {:x1 x1 :y1 y2 :x2 (- x1 5) :y2 y2
+        [:line {:x1 up-right-x :y1 bottom-right-y
+                :x2 (- up-right-x 5) :y2 bottom-right-y
                 :stroke (get-from-palette :elevation-legend-stroke)}]
-        [:text {:x (- x1 15)
-                :y (- y2 2)
+        [:text {:x (- up-right-x 15)
+                :y (- bottom-right-y 2)
                 :font-family "Fira Sans"
                 :font-size "60%"
                 :fill (get-from-palette :elevation-legend-text)}
          (str min-elevation)]
-        [:text {:x (- x1 35)
+        [:text {:x (- up-right-x 35)
                 :y 2
                 :font-family "Fira Sans"
                 :font-size "60%"
                 :dominant-baseline "hanging"
                 :fill (get-from-palette :elevation-legend-stroke)}
          (str max-elevation)]])
-     (when daily-kilometers
+     ;; TODO I should have finer control here
+     (when (and with-legend daily-stats)
        (reset-alternating-background!)
-       (for [d daily-kilometers]
+       (for [d daily-stats]
          (let [{dx1 :x} (pointspace-to-viewbox-space
                          {:x (:covered d)
                           :y 0
@@ -161,9 +169,32 @@
              (str "▲ " (Math/floor (:elevation d)) " m")]
             [:rect {:x dx1
                     :y 0
-                    :width dx2 :height y2
+                    :width dx2 :height bottom-right-y
                     :fill (get-alternating-background!)
-                    :fill-opacity 0.4}]])))
+                    :fill-opacity 0.4}]
+            (when (:pauses d)
+              (for [p (:pauses d)]
+                (let [{px :x} (pointspace-to-viewbox-space
+                               {:x (+ (:covered d)
+                                      (* (:average-speed plan)
+                                         (:after p)))
+                                :y 0  ; not important, not used
+                                :pointspace pointspace
+                                :viewbox viewbox})]
+                  [:g
+                   [:line {:x1 px :y1 0 :x2 px :y2 bottom-right-y
+                           :stroke (get-from-palette :elevation-legend-stroke)
+                           :stroke-dasharray "4 2"}]
+                   [:rect {:x (- px 10) :y (- bottom-right-y 12)
+                           :width 20 :height 12
+                           :fill (get-from-palette :pause-marker)}]
+                   [:text {:x px :y (- bottom-right-y 2)
+                           :text-anchor "middle"
+                           :font-weight "bold"
+                           :font-family "Fira Sans"
+                           :font-size "55%"
+                           :fill (get-from-palette :dark-text)}
+                    (str (:length p) "h")]])))])))
      [:path {:stroke (get-from-palette :elevation-trend)
              :stroke-width 1
              :fill "none"
@@ -173,17 +204,15 @@
   {:transform-fn (comp clerk/mark-presented
                        (clerk/update-val
                         #(clerk/html
-                          (let [elevation (gpx/elevation (:gpx %))
-                                total-distance (gpx/total-distance (:gpx %))
+                          (let [total-distance (gpx/total-distance (:gpx %))
                                 viewbox [0 0 600 200]]
                             [:svg {:width 600
                                    :height 200
                                    :style {:background-color (get-from-palette :background)}}
-                             (elevation-diagram {:elevation elevation
-                                                 :daily-kilometers (plan/daily-distance %)
-                                                 :with-legend true
+                             (elevation-diagram {:plan %
                                                  :from 0
                                                  :to total-distance
+                                                 :with-legend true
                                                  :viewbox viewbox})]))))})
 
 (defn pauses-diagram [{:keys [pauses]}]
@@ -258,8 +287,11 @@
                           ))}
           (str (+ kilometers (* average-speed (+ 1 n))))]]))))
 
-(defn day-plan->svg [day-plan km average-speed elevation center]
-  (let [pauses (plan/pauses day-plan)
+(defn day-plan->svg [plan index km center]
+  (let [day-plan (nth (:daily-plans plan) index)
+        average-speed (:average-speed plan)
+        elevation (gpx/elevation (:gpx plan))
+        pauses (plan/pauses day-plan)
         main-offset (* (/ km average-speed) box-size)
         total-km-for-day (plan/kilometers-in-a-day day-plan average-speed)]
     (into [:svg
@@ -282,7 +314,7 @@
                          elevation km (+ km total-km-for-day))) " m")]
            [:g {:transform (str "translate(" (+ left-margin
                                                 main-offset) " 0)")}
-            (elevation-diagram {:elevation elevation
+            (elevation-diagram {:plan plan
                                 :from km
                                 :to (+ km total-km-for-day)
                                 :viewbox [0 0 (* box-size
@@ -360,7 +392,7 @@
                            (str (* average-speed (+ 1 i)))]))
              output))]))
 
-(defn plan->diagram [plan]
+(defn plan-diagram [plan]
   (let [total-distance (gpx/total-distance (:gpx plan))
         elevation (gpx/elevation (:gpx plan))
         center (gpx/center (gpx/points (:gpx plan)))
@@ -374,24 +406,21 @@
       (plan-main-kilometers-svg total-distance
                                 average-speed
                                 elevation)]
-     (loop [i 0
+     (loop [index 0
             total-kilometers-covered 0
             output [:g]]
-       (if (< i (count (:daily-plans plan)))
-         (recur (inc i)
+       (if (< index (count (:daily-plans plan)))
+         (recur (inc index)
                 (+ total-kilometers-covered
-                   (plan/kilometers-in-a-day (nth (:daily-plans plan) i)
+                   (plan/kilometers-in-a-day (nth (:daily-plans plan) index)
                                              average-speed))
                 (conj output [:g {:transform (str "translate(0 "
-                                                  (+ 50
-                                                     (* i 50)) ")")}
-                              (day-plan->svg (nth (:daily-plans plan) i)
+                                                  (+ 50 (* index 50)) ")")}
+                              (day-plan->svg plan index
                                              total-kilometers-covered
-                                             average-speed
-                                             elevation
                                              center)]))
          output))]))
 
 (def plan-viewer
   {:transform-fn (comp clerk/mark-presented
-                       (clerk/update-val #(clerk/html (plan->diagram %))))})
+                       (clerk/update-val #(clerk/html (plan-diagram %))))})

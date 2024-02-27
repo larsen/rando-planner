@@ -94,16 +94,20 @@
   :kilometers"
   [plan]
   (let [points-with-cumulative-distance (-> (:gpx plan)
-                       gpx/points
-                       gpx/with-cumulative-distance)
+                                            gpx/points
+                                            gpx/with-cumulative-distance)
         daily-distance (daily-distance plan)
         points-at-end-of-days (for [dk daily-distance]
                                 (first (filter (fn [p]
                                                  (> (:cumulative-distance p)
                                                     (+ (:covered dk)
                                                        (:kilometers dk))))
-                                               points-with-cumulative-distance)))]
+                                               points-with-cumulative-distance)))
+        daily-pauses (vec (map
+                           (fn [pauses]
+                             {:pauses pauses})
+                           (map pauses (:daily-plans plan))))]
     (map merge
          points-at-end-of-days
          daily-distance
-         )))
+         daily-pauses)))
