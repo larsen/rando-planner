@@ -17,7 +17,19 @@
 (defn add-plan-markers [plan]
   (if (and (:gpx plan)
            (:daily-plans plan))
-    (assoc plan :markers (butlast (plan/daily-stats plan)))
+    (assoc plan :markers
+           (map (fn [pp]
+                  (assoc pp :popup-message
+                         (str "<small>"
+                              "<strong>" (:label pp) "</strong>"
+                              "<br />"
+                              (Math/floor (:kilometers pp))
+                              " km / ("
+                              (Math/floor (:cumulative-distance pp))
+                              " km) ▲ "
+                              (Math/floor (:elevation pp))
+                              "</small>")))
+                (butlast (plan/daily-stats plan))))
     plan))
 
 (defn enrich-with-gpx-details [value]
@@ -59,13 +71,5 @@
                                             (doseq [pp (:markers value)]
                                               (.bindPopup
                                                (.addTo (.marker js/L (clj->js [(:lat pp) (:lon pp)])) @m)
-                                               (str "<small>"
-                                                    "<strong>" (:label pp) "</strong>"
-                                                    "<br />"
-                                                    (.floor js/Math (:kilometers pp))
-                                                    " km / ("
-                                                    (.floor js/Math (:cumulative-distance pp))
-                                                    " km) ▲ "
-                                                    (.floor js/Math (:elevation pp))
-                                                    "</small>")))))
+                                               (:popup-message pp)))))
                                         (.remove @m)))}]))]))})
