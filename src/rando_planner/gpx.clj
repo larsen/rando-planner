@@ -29,8 +29,8 @@
         max-lat (apply max lats)
         min-lon (apply min lons)
         max-lon (apply max lons)]
-      [[min-lat min-lon]
-       [max-lat max-lon]]))
+    [[min-lat min-lon]
+     [max-lat max-lon]]))
 
 (defn center
   "Given a set of points (represented as dictionaries with a :lat and a :lon),
@@ -38,8 +38,8 @@
   track on a map"
   [points]
   (let [[[min-lat min-lon] [max-lat max-lon]] (bounds points)]
-    [(+ min-lat (/ (- max-lat min-lat) 2 ))
-     (+ min-lon (/ (- max-lon min-lon) 2 ))]))
+    [(+ min-lat (/ (- max-lat min-lat) 2))
+     (+ min-lon (/ (- max-lon min-lon) 2))]))
 
 (defn haversine [point1 point2]
   (let [earth-radius 6371
