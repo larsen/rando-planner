@@ -38,6 +38,21 @@
        (* c2 (Math/sin (* 2 mean-anomaly)))
        (* c3 (Math/sin (* 3 mean-anomaly))))))
 
+(defn ecliptic-longitude [mean-anomaly-deg equation-of-the-center-deg]
+  (let [perihelion 102.9373]
+    (Math/toRadians
+     (mod (+ mean-anomaly-deg
+             equation-of-the-center-deg
+             180 perihelion) 360))))
+
+(defn solar-transit [mean-solar-time
+                     mean-anomaly-rad
+                     ecliptic-longitude-rad]
+  (+ j2000
+     mean-solar-time
+     (* 0.0053 (Math/sin mean-anomaly-rad))
+     (- (* 0.0069 (Math/sin (* 2 ecliptic-longitude-rad))))))
+
 (defn sunset-sunrise-times [ts lat lon elevation]
   (let [j (ts->julian-date ts)
         ;; Julian day (from Jan 1st, 2000)
@@ -53,15 +68,12 @@
         C-deg (equation-of-the-center M-rad)
 
         ;; Ecliptic longitude
-        perihelion 102.9373
-        L-deg (mod (+ M-deg C-deg 180 perihelion) 360)
-        L-rad (Math/toRadians L-deg)
+        L-rad (ecliptic-longitude M-deg C-deg)
 
         ;; Solar transit
-        J-transit (+ j2000
-                     mean-solar-time
-                     (* 0.0053 (Math/sin M-rad))
-                     (* 0.0069 (Math/sin (* 2 L-rad))))
+        J-transit (solar-transit mean-solar-time
+                                 M-rad
+                                 L-rad)
 
         ;; Declination of the Sun
         obliquity 23.4397
