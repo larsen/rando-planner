@@ -1,5 +1,7 @@
 (ns rando-planner.suncalc
-  (:require [clj-time.coerce :as cjc]))
+  (:require
+   [clj-time.core :as cjt]
+   [clj-time.coerce :as cjc]))
 
 ;; # Sunset & sunrise calculations
 
@@ -79,35 +81,42 @@
                      cos-d))]
     (Math/toDegrees (Math/acos w0-cos))))
 
-(defn sunset-sunrise-times [ts lat lon elevation]
-  (let [j (ts->julian-date ts)
-        ;; Julian day (from Jan 1st, 2000)
-        ;; with adjustments
-        n (julian-date->julian-day j)
+(defn sunset-sunrise-times
+  ([ts lat lon elevation]
+   (sunset-sunrise-times ts lat lon elevation "UTC"))
+  ([ts lat lon elevation tz]
+   (let [j (ts->julian-date ts)
+         ;; Julian day (from Jan 1st, 2000)
+         ;; with adjustments
+         n (julian-date->julian-day j)
 
-        ;; Solar mean anomaly
-        mean-solar-time (mean-solar-time n lon)
-        M-deg (mean-anomaly mean-solar-time)
-        M-rad (Math/toRadians M-deg)
+         ;; Solar mean anomaly
+         mean-solar-time (mean-solar-time n lon)
+         M-deg (mean-anomaly mean-solar-time)
+         M-rad (Math/toRadians M-deg)
 
-        ;; Equation of the center
-        C-deg (equation-of-the-center M-rad)
+         ;; Equation of the center
+         C-deg (equation-of-the-center M-rad)
 
-        ;; Ecliptic longitude
-        L-rad (ecliptic-longitude M-deg C-deg)
+         ;; Ecliptic longitude
+         L-rad (ecliptic-longitude M-deg C-deg)
 
-        ;; Solar transit
-        J-transit (solar-transit mean-solar-time
-                                 M-rad
-                                 L-rad)
+         ;; Solar transit
+         J-transit (solar-transit mean-solar-time
+                                  M-rad
+                                  L-rad)
 
-        ;; Hour angle
-        w0-deg (hour-angle lat elevation L-rad)
+         ;; Hour angle
+         w0-deg (hour-angle lat elevation L-rad)
 
-        j-rise (- J-transit (/ w0-deg 360))
-        j-set (+ J-transit (/ w0-deg 360))]
-    [(cjc/from-long (long (* 1000 (julian-date->ts j-rise))))
-     (cjc/from-long (long (* 1000 (julian-date->ts j-set))))]))
+         j-rise (- J-transit (/ w0-deg 360))
+         j-set (+ J-transit (/ w0-deg 360))]
+     [(cjt/to-time-zone
+       (cjc/from-long (long (* 1000 (julian-date->ts j-rise))))
+       (cjt/time-zone-for-id tz))
+      (cjt/to-time-zone
+       (cjc/from-long (long (* 1000 (julian-date->ts j-set))))
+       (cjt/time-zone-for-id tz))])))
 
 ;;    Corresponding ~ to Veneto
 ;;    [45.485717 11.315627]
