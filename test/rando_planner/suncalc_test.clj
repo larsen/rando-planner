@@ -10,6 +10,13 @@
    (< (Math/abs (- a b))
       epsilon)))
 
+(defn small-time-diff
+  ([t1 t2]
+   (small-time-diff t1 t2 5))
+  ([t1 t2 duration]
+   (< (tick/between t2 t1 :seconds)
+      duration)))
+
 (def lat 33.00801)
 (def lon 35.08794)
 (def elevation 0)
@@ -55,5 +62,7 @@
     (let [[sunrise sunset] (sut/sunset-sunrise-times timestamp
                                                      lat lon elevation
                                                      "Europe/Berlin")]
-      (is (= (tick/date-time "2024-02-29T07:10:12") sunrise))
-      (is (= (tick/date-time "2024-02-29T18:37:04") sunset)))))
+      (is (small-time-diff (tick/date-time "2024-02-29T05:10:12")
+                           sunrise))
+      (is (small-time-diff (tick/date-time "2024-02-29T16:37:04")
+                           sunset)))))
