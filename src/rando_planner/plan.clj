@@ -27,6 +27,7 @@
   (let [activities (:activities day-plan)
         plan-starts-at (tick/time (:start (first activities)))]
     (loop [p []
+           cumulative-pause 0
            curr-activity (first activities)
            next-activities (rest activities)]
       (if (first next-activities)
@@ -42,7 +43,9 @@
                           ;; TODO
                           ;; it should manage pauses that last
                           ;; a fractional number of hours
-                          :length (tick/hours pause-length)})
+                          :length (tick/hours pause-length)
+                          :cumulative-pause cumulative-pause})
+                 (+ cumulative-pause (tick/hours pause-length))
                  (first next-activities)
                  (rest next-activities)))
         p))))
