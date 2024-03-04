@@ -253,7 +253,7 @@
     (for [n (range (:length activity))]
       (let [start (tick/date-time
                    (str (:date day-plan) "T" (:start activity)))
-            t1 (tick/>> start (tick/duration (+ 1 n) :hours))
+            t1 (tick/>> start (tick/new-duration (+ 1 n) :hours))
             t1-str (str t1)
             before-sunrise? (tick/< t1 sunrise)
             after-sunset? (tick/> t1 sunset)]
