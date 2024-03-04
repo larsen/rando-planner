@@ -1,8 +1,6 @@
 (ns rando-planner.diagram
   (:require [clojure.string :as str]
-            [clj-time.core :as t]
-            [clj-time.format :as f]
-            [clj-time.coerce :as c]
+            [tick.core :as tick]
             [rando-planner.gpx :as gpx]
             [rando-planner.plan :as plan]
             [rando-planner.suncalc :as suncalc]
@@ -244,17 +242,21 @@
   (let [[lat lon] gpx-center
         [sunrise sunset] (suncalc/sunset-sunrise-times
                           (+ (/ 86400 2)
-                             (/ (c/to-long (plan/string-to-date (:date day-plan)))
+                             (/ (plan/date-to-timestamp
+                                 (str (:date day-plan) "T00:00"))
                                 1000))
-                          lat lon 0)
+                          lat lon
+                          ;; TODO The altitude should be configurable
+                          ;; by the user
+                          0)
         margin (+ left-margin offset-of-previous-activities)]
     (for [n (range (:length activity))]
-      (let [start (f/parse (f/formatter "YYYY-MM-DD HH:mm")
-                           (str (:date day-plan) " " (:start activity)))
-            t1 (t/plus start (t/hours (+ 1 n)))
-            t1-str (f/unparse (f/formatter "HH:mm") t1)
-            before-sunrise? (t/before? t1 sunrise)
-            after-sunset? (t/after? t1 sunset)]
+      (let [start (tick/date-time
+                   (str (:date day-plan) "T" (:start activity)))
+            t1 (tick/>> start (tick/new-duration (+ 1 n) :hours))
+            t1-str (str t1)
+            before-sunrise? (tick/< t1 sunrise)
+            after-sunset? (tick/> t1 sunset)]
         [:g
          [:text {:x (+ margin box-size (* n box-size))
                  :y 25
