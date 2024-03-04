@@ -1,6 +1,6 @@
 (ns rando-planner.suncalc-test
   (:require [rando-planner.suncalc :as sut]
-            [clj-time.core :as cjt]
+            [tick.core :as tick]
             [clojure.test :refer [deftest is testing]]))
 
 (defn small-diff
@@ -55,5 +55,5 @@
     (let [[sunrise sunset] (sut/sunset-sunrise-times timestamp
                                                      lat lon elevation
                                                      "Europe/Berlin")]
-      (is (= (cjt/date-time 2024 02 29 7 10 12) sunrise))
-      (is (= (cjt/date-time 2024 02 29 18 37 4) sunset)))))
+      (is (= (tick/date-time "2024-02-29T07:10:12") sunrise))
+      (is (= (tick/date-time "2024-02-29T18:37:04") sunset)))))

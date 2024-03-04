@@ -1,8 +1,5 @@
 (ns rando-planner.suncalc
-  (:require
-   [tick.core :as tick]
-   [clj-time.core :as cjt]
-   [clj-time.coerce :as cjc]))
+  (:require [tick.core :as tick]))
 
 ;; # Sunset & sunrise calculations
 
@@ -27,7 +24,7 @@
      (/ lon 360)))
 
 (defn mean-anomaly [mean-solar-time]
-  ;; Values for plan Earth
+  ;; Values for planet Earth
   (let [m0 357.5291
         m1 0.98560028]
     (mod (+ m0 (* m1 mean-solar-time))
