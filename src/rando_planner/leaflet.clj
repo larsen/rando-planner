@@ -9,7 +9,7 @@
   (if (:gpx plan)
     (let [points (gpx/points (:gpx plan))]
       (assoc plan
-             :gpx-content (xml/xml-data-raw (:gpx plan))
+             :points points
              :center (gpx/center points)
              :bounds (gpx/bounds points)))
     plan))
@@ -43,8 +43,7 @@
    :render-fn '(fn [value]
                  (when value
                    [nextjournal.clerk.render/with-d3-require
-                    {:package ["leaflet@1.7.1/dist/leaflet.min.js"
-                               "leaflet-gpx@1.5.1/gpx.min.js"]}
+                    {:package ["leaflet@1.7.1/dist/leaflet.min.js"]}
                     (fn [leaflet]
                       (let [map-div-id (str (gensym))
                             m (atom nil)
@@ -56,17 +55,32 @@
                                :style {:height "400px"}
                                :ref (fn [el]
                                       (if el
-                                        (let [tile-layer (.tileLayer js/L "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                        (let [start (first (:points value))
+                                              end (last (:points value))
+                                              start-icon (.icon js/L (clj->js {:iconUrl (:startIconUrl marker-options)
+                                                                               :iconSize [33, 45]
+                                                                               :iconAnchor [16, 45]}))
+                                              end-icon (.icon js/L (clj->js {:iconUrl (:endIconUrl marker-options)
+                                                                             :iconSize [33, 45]
+                                                                             :iconAnchor [16, 45]}))
+                                              tile-layer (.tileLayer js/L "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
                                                                      (clj->js {:attribution attribution}))
-                                              gpx-layer (new js/L.GPX (:gpx-content value)
-                                                             (clj->js {:async true
-                                                                       :marker_options marker-options}))]
+                                              polyline (.polyline js/L
+                                                                  (clj->js (vec (map (fn [{lat :lat, lon :lon} p]
+                                                                                       [lat lon])
+                                                                                     (:points value))))
+                                                                  (clj->js (:color "red")))]
                                           (reset! m (.map js/L map-div-id))
                                           (if (:bounds value)
                                             (.fitBounds @m (clj->js (:bounds value)))
                                             (.setView @m (clj->js (:center value)) (:zoom value)))
                                           (.addTo tile-layer @m)
-                                          (.addTo gpx-layer @m)
+                                          (when (:points value)
+                                            (.addTo polyline @m)
+                                            (.addTo (.marker js/L (clj->js [(:lat start) (:lon start)])
+                                                             (clj->js {:icon start-icon})) @m)
+                                            (.addTo (.marker js/L (clj->js [(:lat end) (:lon end)])
+                                                             (clj->js {:icon end-icon})) @m))
                                           (when (:markers value)
                                             (doseq [pp (:markers value)]
                                               (.bindPopup
