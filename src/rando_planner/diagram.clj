@@ -171,7 +171,8 @@
                 (let [{px :x} (pointspace-to-viewbox-space
                                {:x (+ (:covered d)
                                       (* average-speed
-                                         (:after p)))
+                                         (- (:after p)
+                                            (:cumulative-pause p))))
                                 :y 0  ; not important, not used
                                 :pointspace pointspace
                                 :viewbox viewbox})]
@@ -216,7 +217,9 @@
       (let [p (nth pauses i)]
         (recur (inc i)
                (conj pauses-diagram
-                     (let [position-x (* (:after p) box-size)
+                     (let [position-x (* (- (:after p)
+                                            (:cumulative-pause p))
+                                         box-size)
                            triangle-vertexes [[position-x 0]
                                               [(- position-x 2) -2]
                                               [(+ position-x 2) -2]]]
