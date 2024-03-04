@@ -75,11 +75,12 @@
                                             (.fitBounds @m (clj->js (:bounds value)))
                                             (.setView @m (clj->js (:center value)) (:zoom value)))
                                           (.addTo tile-layer @m)
-                                          (.addTo polyline @m)
-                                          (.addTo (.marker js/L (clj->js [(:lat start) (:lon start)])
-                                                           (clj->js {:icon start-icon})) @m)
-                                          (.addTo (.marker js/L (clj->js [(:lat end) (:lon end)])
-                                                           (clj->js {:icon end-icon})) @m)
+                                          (when (:points value)
+                                            (.addTo polyline @m)
+                                            (.addTo (.marker js/L (clj->js [(:lat start) (:lon start)])
+                                                             (clj->js {:icon start-icon})) @m)
+                                            (.addTo (.marker js/L (clj->js [(:lat end) (:lon end)])
+                                                             (clj->js {:icon end-icon})) @m))
                                           (when (:markers value)
                                             (doseq [pp (:markers value)]
                                               (.bindPopup
