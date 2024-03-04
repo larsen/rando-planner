@@ -54,6 +54,6 @@
   (testing "Sunrise & sunset"
     (let [[sunrise sunset] (sut/sunset-sunrise-times timestamp
                                                      lat lon elevation
-                                                     "CET")]
+                                                     "Europe/Berlin")]
       (is (= (cjt/date-time 2024 02 29 7 10 12) sunrise))
       (is (= (cjt/date-time 2024 02 29 18 37 4) sunset)))))

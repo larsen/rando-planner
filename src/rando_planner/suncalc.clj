@@ -1,5 +1,6 @@
 (ns rando-planner.suncalc
   (:require
+   [tick.core :as tick]
    [clj-time.core :as cjt]
    [clj-time.coerce :as cjc]))
 
@@ -81,6 +82,12 @@
                      cos-d))]
     (Math/toDegrees (Math/acos w0-cos))))
 
+(defn timestamp-to-timezone [ts z]
+  (-> ts
+      (tick/instant)
+      (tick/in z)
+      (tick/date-time)))
+
 (defn sunset-sunrise-times
   ([ts lat lon elevation]
    (sunset-sunrise-times ts lat lon elevation "UTC"))
@@ -111,12 +118,10 @@
 
          j-rise (- J-transit (/ w0-deg 360))
          j-set (+ J-transit (/ w0-deg 360))]
-     [(cjt/to-time-zone
-       (cjc/from-long (long (* 1000 (julian-date->ts j-rise))))
-       (cjt/time-zone-for-id tz))
-      (cjt/to-time-zone
-       (cjc/from-long (long (* 1000 (julian-date->ts j-set))))
-       (cjt/time-zone-for-id tz))])))
+     [(timestamp-to-timezone (long (* 1000 (julian-date->ts j-rise)))
+                             tz)
+      (timestamp-to-timezone (long (* 1000 (julian-date->ts j-set)))
+                             tz)])))
 
 ;;    Corresponding ~ to Veneto
 ;;    [45.485717 11.315627]

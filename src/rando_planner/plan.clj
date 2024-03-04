@@ -1,25 +1,17 @@
 (ns rando-planner.plan
-  (:require [clj-time.core :as t]
-            [clj-time.format :as f]
+  (:require [tick.core :as tick]
+            [cljc.java-time.instant :as i]
             [rando-planner.gpx :as gpx]))
 
-(defn string-to-date [date-str]
-  (let [formatter (f/formatter "YYYY-MM-DD")]
-    (f/parse formatter date-str)))
-
-(defn string-to-time [time-str]
-  (let [formatter (f/formatter "HH:mm")]
-    (f/parse formatter time-str)))
-
-(defn time-to-string [dt]
-  (let [formatter (f/formatter "HH:mm")]
-    (f/unparse formatter dt)))
+(defn date-to-timestamp [date-time-str]
+  (-> date-time-str
+      tick/date-time
+      tick/instant
+      i/to-epoch-milli))
 
 (defn time-after-n-hours [start n]
-  (t/plus (string-to-time start) (t/hours n)))
-
-(defn time-after-n-hours-as-str [start n]
-  (time-to-string (time-after-n-hours start n)))
+  (tick/>> (tick/time start)
+           (tick/new-duration n :hours)))
 
 (defn kilometers-in-a-day [day-plan average-speed]
   (reduce + (map #(* (:length %) average-speed)
@@ -33,23 +25,24 @@
   and how many hours after the start of the day the pause occurs."
   [day-plan]
   (let [activities (:activities day-plan)
-        plan-starts-at (string-to-time (:start (first activities)))]
+        plan-starts-at (tick/time (:start (first activities)))]
     (loop [p []
            curr-activity (first activities)
            next-activities (rest activities)]
       (if (first next-activities)
-        (let [pause-start (t/plus (string-to-time (:start curr-activity))
-                                  (t/hours (:length curr-activity)))
-              pause-start-as-str (time-to-string pause-start)
-              pause-length (t/interval pause-start
-                                       (string-to-time (:start (first next-activities))))]
+        (let [pause-start (time-after-n-hours (tick/time (:start curr-activity))
+                                              (:length curr-activity))
+              pause-start-as-str (str pause-start)
+              pause-length (tick/between pause-start
+                                         (tick/time
+                                          (:start (first next-activities))))]
           (recur (conj p {:start pause-start-as-str
-                          :after (t/in-hours (t/interval plan-starts-at
-                                                         pause-start))
+                          :after (tick/hours (tick/between plan-starts-at
+                                                           pause-start))
                           ;; TODO
                           ;; it should manage pauses that last
                           ;; a fractional number of hours
-                          :length (t/in-hours pause-length)})
+                          :length (tick/hours pause-length)})
                  (first next-activities)
                  (rest next-activities)))
         p))))
