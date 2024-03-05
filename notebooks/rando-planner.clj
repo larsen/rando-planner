@@ -192,9 +192,11 @@ be morale-crushing."]])
  (clerk/row
   (clerk/col
    (clerk/html [:h3 "Plan with no lunch!"])
+   (clerk/with-viewer diagram/elevation-viewer equally-split-plan)
    (clerk/with-viewer diagram/plan-viewer equally-split-plan))
   (clerk/col
    (clerk/html [:h3 "Plan with a pause"])
+   (clerk/with-viewer diagram/elevation-viewer equally-split-plan-with-pauses)
    (clerk/with-viewer diagram/plan-viewer equally-split-plan-with-pauses))))
 
 ;; The last plan we made looks promising, let's see on the map where

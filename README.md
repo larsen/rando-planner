@@ -29,9 +29,30 @@ The visualizations include:
 
 ## Usage
 
-At the moment, in order to use this code, you have to clone this
-repository and add a new notebook in the `notebooks` folder.  You can
-use all Clerk features plus those provided by `rando-planner`.
+Add `rando-planner` as a dependency in your project. For example:
+
+```
+{:paths ["src"]
+ :deps {org.clojure/clojure {:mvn/version "1.10.3"}
+        rando-planner/rando-planner {:git/url "https://github.com/larsen/rando-planner.git"
+                                     :git/tag "tagname"
+                                     :git/sha "xxxxxxxx"}}}
+```
+
+Then, in a `src/user.clj` file:
+
+```clojure
+(ns user)
+
+(require '[nextjournal.clerk :as clerk])
+
+(clerk/serve! {:watch-paths ["notebooks" "src"]})
+```
+
+When jacking-in the project a HTTP server should start, answering on
+port 7777. At this point you can start editing notebooks (I typically
+use the directory `notebooks` to store them) using the facilities
+provided by rando-planner.
 
 ### Defining a plan
 
