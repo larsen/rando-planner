@@ -1,6 +1,7 @@
 ^{:nextjournal.clerk/visibility {:code :hide}}
 (ns notebooks.rando-planner
     (:require [rando-planner.gpx :as gpx]
+              [rando-planner.plan :as plan]
               [rando-planner.diagram :as diagram]
               [rando-planner.leaflet :as leaflet]
               [nextjournal.clerk :as clerk]))
@@ -13,6 +14,24 @@
 
 ;; # [rando-planner](https://github.com/larsen/rando-planner) 🚲
 
+^{:nextjournal.clerk/visibility {:code :hide}}
+(let [example-plan {:gpx "gpx/be-rostock.gpx"
+                    :average-speed 20
+                    :daily-plans [{:date "2024-04-01"
+                                   :label "First day"
+                                   :activities [{:start "10:00" :type :ride :length 3}
+                                                {:start "15:00" :type :ride :length 5}]}
+                                  {:date "2024-04-02"
+                                   :label "Second day"
+                                   :activities [{:start "10:00" :type :ride :length 4}
+                                                {:start "16:00" :type :ride :length 2.5}]}]}]
+  (merge
+   {:nextjournal/width :full}
+   (clerk/row
+    (clerk/col
+     (clerk/with-viewer diagram/elevation-viewer example-plan))
+    (clerk/col
+     (clerk/with-viewer diagram/plan-viewer example-plan)))))
 
 ;; **rando-planner**:
 
