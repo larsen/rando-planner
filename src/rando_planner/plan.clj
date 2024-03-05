@@ -74,6 +74,18 @@
                  (inc i)))
         result))))
 
+(defn group-points-by-day [plan]
+  (let [points-with-cumulative-distance (gpx/with-cumulative-distance
+                                          (gpx/points (:gpx plan)))]
+    (map (fn [d]
+           (filter #(and (>= (:cumulative-distance %)
+                            (:covered d))
+                         (< (:cumulative-distance %)
+                            (+ (:covered d)
+                               (:kilometers d))))
+                   points-with-cumulative-distance))
+         (daily-distance plan))))
+
 (defn daily-stats
   "Given a plan, it returns a list of dictionaries with info and
   statistics for each day in the plan, including:

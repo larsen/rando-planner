@@ -10,6 +10,7 @@
     (let [points (gpx/points (:gpx plan))]
       (assoc plan
              :points points
+             :grouped-by-day (plan/group-points-by-day plan)
              :center (gpx/center points)
              :bounds (gpx/bounds points)))
     plan))
@@ -64,19 +65,25 @@
                                                                              :iconSize [33, 45]
                                                                              :iconAnchor [16, 45]}))
                                               tile-layer (.tileLayer js/L "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                                                     (clj->js {:attribution attribution}))
-                                              polyline (.polyline js/L
-                                                                  (clj->js (vec (map (fn [{lat :lat, lon :lon} p]
-                                                                                       [lat lon])
-                                                                                     (:points value))))
-                                                                  (clj->js (:color "red")))]
+                                                                     (clj->js {:attribution attribution}))]
                                           (reset! m (.map js/L map-div-id))
                                           (if (:bounds value)
                                             (.fitBounds @m (clj->js (:bounds value)))
                                             (.setView @m (clj->js (:center value)) (:zoom value)))
                                           (.addTo tile-layer @m)
                                           (when (:points value)
-                                            (.addTo polyline @m)
+                                            (let [point-groups (:grouped-by-day value)]
+                                              (js/console.log (count point-groups))
+                                              (doall
+                                               (for [[pp color] (map vector
+                                                                     point-groups
+                                                                     (take (count point-groups)
+                                                                           (cycle '("red" "green" "blue"))))]
+                                                 (.addTo (.polyline js/L (clj->js (map (fn [{lat :lat, lon :lon} p]
+                                                                                         [lat lon])
+                                                                                       pp))
+                                                                    (clj->js {:color color}))
+                                                         @m))))
                                             (.addTo (.marker js/L (clj->js [(:lat start) (:lon start)])
                                                              (clj->js {:icon start-icon})) @m)
                                             (.addTo (.marker js/L (clj->js [(:lat end) (:lon end)])
