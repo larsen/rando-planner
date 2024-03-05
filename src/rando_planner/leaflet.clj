@@ -78,7 +78,7 @@
                                                (for [[pp color] (map vector
                                                                      point-groups
                                                                      (take (count point-groups)
-                                                                           (cycle '("red" "green" "blue"))))]
+                                                                           (cycle '["#660e60","#893f71","#ac6f82","#cfa093","#f3d0a4"])))]
                                                  (.addTo (.polyline js/L (clj->js (map (fn [{lat :lat, lon :lon} p]
                                                                                          [lat lon])
                                                                                        pp))
