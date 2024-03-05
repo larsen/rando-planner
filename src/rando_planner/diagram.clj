@@ -257,7 +257,7 @@
       (let [start (tick/date-time
                    (str (:date day-plan) "T" (:start activity)))
             t1 (tick/>> start (tick/new-duration (+ 1 n) :hours))
-            t1-str (str t1)
+            t1-str (tick/format (tick/formatter "hh:mm") t1)
             before-sunrise? (tick/< t1 sunrise)
             after-sunset? (tick/> t1 sunset)]
         [:g
