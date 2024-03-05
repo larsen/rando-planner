@@ -52,10 +52,9 @@
 ;;   - sunrise and sunset indicators (WIP)
 
 ;; - Map visualization (based
-;;   on [Leaflet](https://github.com/Leaflet/Leaflet)
-;;   and [leaflet-gpx](https://github.com/mpetazzoni/leaflet-gpx)) of
-;;   the route, with markers corresponding to the location reached
-;;   after each day is completed.
+;;   on [Leaflet](https://github.com/Leaflet/Leaflet)) of the route,
+;;   with markers corresponding to the location reached after each day
+;;   is completed.
 
 ;; ## Usage example
 
