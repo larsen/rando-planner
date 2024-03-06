@@ -1,7 +1,5 @@
 (ns rando-planner.leaflet
   (:require [nextjournal.clerk :as clerk]
-            ; [nextjournal.clerk.viewer :as v]
-            [rando-planner.xml :as xml]
             [rando-planner.gpx :as gpx]
             [rando-planner.plan :as plan]))
 
