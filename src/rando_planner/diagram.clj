@@ -12,9 +12,6 @@
                     (concat (include-fn state)
                             (list (hiccup.page/include-css "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"))))))
 
-(defn viewbox-dimensions-to-str [viewbox-dimensions]
-  (str/join " " (map str viewbox-dimensions)))
-
 (defn points->path
   "Turn a sequence of points into an SVG path string."
   [[{start-x :x, start-y :y} & pts]]
