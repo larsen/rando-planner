@@ -3,4 +3,4 @@
         org.clojure/data.xml {:mvn/version "0.0.8"}
         io.github.nextjournal/clerk {:mvn/version "0.17.1102"}
         com.widdindustries/cljc.java-time {:mvn/version "0.1.21"}
-        tick/tick {:mvn/version "0.7.5"}}}
+        tick/tick {:mvn/version "1.0"}}}
