@@ -54,14 +54,26 @@
   "Given a plan, it returns a vector of structures containing how many
   kilometers are done in each day, and from what kilometer each day starts"
   [plan]
-  (let [daily-plans (:daily-plans plan)
-        elevation (gpx/elevation  (:gpx plan))]
+  (let [default-average-speed 20
+        default-daily-plans [{:date (str (tick/today))
+                              :label "_day0"
+                              :activities [{:start "05:00"
+                                            :type :ride
+                                            :length (/ (gpx/total-distance
+                                                        (:gpx plan))
+                                                       default-average-speed)}]}]
+        daily-plans (or (:daily-plans plan)
+                        ;; If the user provided no plan, then a ficticious one
+                        ;; is used just for the sake of the calculations
+                        default-daily-plans)
+        elevation (gpx/elevation (:gpx plan))]
     (loop [result []
            acc-km 0
            i 0]
       (if (< i (count daily-plans))
         (let [km (kilometers-in-a-day (nth daily-plans i)
-                                      (:average-speed plan))]
+                                      (or (:average-speed plan)
+                                          default-average-speed))]
           (recur (conj result
                        {:day (+ 1 i)
                         :label (:label (nth daily-plans i))
