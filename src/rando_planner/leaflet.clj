@@ -31,11 +31,11 @@
                 (butlast (plan/daily-stats plan))))
     plan))
 
-(defn add-10km-markers [plan]
+(defn add-km-markers [plan]
   (let [points-with-cumulative-distance (-> (:gpx plan)
                                             gpx/points
                                             gpx/with-cumulative-distance)]
-    (assoc plan :10km-markers
+    (assoc plan :km-markers
            (loop [acc 0
                   last-marker-distance 0
                   markers []
@@ -57,7 +57,7 @@
   (-> value
       add-center-and-bounds
       add-plan-markers
-      add-10km-markers))
+      add-km-markers))
 
 (def leaflet-gpx-viewer
   {:transform-fn (comp clerk/mark-presented
@@ -114,8 +114,8 @@
                                               (.bindPopup
                                                (.addTo (.marker js/L (clj->js [(:lat pp) (:lon pp)])) @m)
                                                (:popup-message pp))))
-                                          (when (:10km-markers value)
-                                            (doseq [pp (:10km-markers value)]
+                                          (when (:km-markers value)
+                                            (doseq [pp (:km-markers value)]
                                               (.addTo (.circle js/L (clj->js [(:lat pp) (:lon pp)])
                                                                (clj->js {:color "#660e60"
                                                                          :fillColor "#660e60"
