@@ -32,7 +32,8 @@
     plan))
 
 (defn add-km-markers [plan]
-  (let [points-with-cumulative-distance (-> (:gpx plan)
+  (let [markers-distance 50
+        points-with-cumulative-distance (-> (:gpx plan)
                                             gpx/points
                                             gpx/with-cumulative-distance)]
     (assoc plan :km-markers
@@ -43,10 +44,10 @@
                   next-points (rest points-with-cumulative-distance)]
              (if (first next-points)
                (recur (+ acc (:distance p))
-                      (if (> (- acc last-marker-distance) 50)
+                      (if (> (- acc last-marker-distance) markers-distance)
                         acc
                         last-marker-distance)
-                      (if (> (- acc last-marker-distance) 50)
+                      (if (> (- acc last-marker-distance) markers-distance)
                         (conj markers p)
                         markers)
                       (first next-points)
