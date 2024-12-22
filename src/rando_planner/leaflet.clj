@@ -31,10 +31,34 @@
                 (butlast (plan/daily-stats plan))))
     plan))
 
+(defn add-km-markers [plan]
+  (let [markers-distance 50
+        points-with-cumulative-distance (-> (:gpx plan)
+                                            gpx/points
+                                            gpx/with-cumulative-distance)]
+    (assoc plan :km-markers
+           (loop [acc 0
+                  last-marker-distance 0
+                  markers []
+                  p (first points-with-cumulative-distance)
+                  next-points (rest points-with-cumulative-distance)]
+             (if (first next-points)
+               (recur (+ acc (:distance p))
+                      (if (> (- acc last-marker-distance) markers-distance)
+                        acc
+                        last-marker-distance)
+                      (if (> (- acc last-marker-distance) markers-distance)
+                        (conj markers p)
+                        markers)
+                      (first next-points)
+                      (rest next-points))
+               markers)))))
+
 (defn enrich-with-gpx-details [value]
   (-> value
       add-center-and-bounds
-      add-plan-markers))
+      add-plan-markers
+      add-km-markers))
 
 (def leaflet-gpx-viewer
   {:transform-fn (comp clerk/mark-presented
@@ -90,5 +114,11 @@
                                             (doseq [pp (:markers value)]
                                               (.bindPopup
                                                (.addTo (.marker js/L (clj->js [(:lat pp) (:lon pp)])) @m)
-                                               (:popup-message pp)))))
+                                               (:popup-message pp))))
+                                          (when (:km-markers value)
+                                            (doseq [pp (:km-markers value)]
+                                              (.addTo (.circle js/L (clj->js [(:lat pp) (:lon pp)])
+                                                               (clj->js {:color "#660e60"
+                                                                         :fillColor "#660e60"
+                                                                         :radius 500})) @m))))
                                         (.remove @m)))}]))]))})
