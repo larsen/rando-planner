@@ -158,11 +158,18 @@
                     :dominant-baseline "hanging"
                     :fill (get-from-palette :elevation-legend-stroke)}
              (str "▲ " (Math/floor (:elevation d)) " m")]
+            [:text {:x (+ dx1 2)
+                    :y 39
+                    :font-family "Fira Sans"
+                    :font-size "60%"
+                    :dominant-baseline "hanging"
+                    :fill (get-from-palette :elevation-legend-stroke)}
+             (str "🚄 " (:average-speed d) " km/h")]
             [:rect {:x dx1
-                    :y 0
-                    :width dx2 :height bottom-right-y
-                    :fill (get-alternating-background!)
-                    :fill-opacity 0.4}]
+                       :y 0
+                       :width dx2 :height bottom-right-y
+                       :fill (get-alternating-background!)
+                       :fill-opacity 0.4}]
             (when (:pauses d)
               (for [p (:pauses d)]
                 (let [{px :x} (pointspace-to-viewbox-space
