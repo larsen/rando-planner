@@ -4,3 +4,4 @@ public/
 .cpcache/
 .lsp/
 .nrepl-port
+.DS_Store
