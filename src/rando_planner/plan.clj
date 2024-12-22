@@ -13,10 +13,19 @@
   (tick/>> (tick/time start)
            (tick/new-duration n :hours)))
 
+(def default-average-speed 18)
+
+(defn average-speed
+      ([day-plan] (or (:average-speed day-plan)
+                      default-average-speed))
+      ([day-plan plan] (or (:average-speed day-plan)
+                           (:average-speed plan)
+                           default-average-speed)))
+
 (defn kilometers-in-a-day [day-plan average-speed]
-  (reduce + (map #(* (:length %) average-speed)
-                 (filter #(= (:type %) :ride)
-                         (:activities day-plan)))))
+      (reduce + (map #(* (:length %) average-speed)
+                     (filter #(= (:type %) :ride)
+                             (:activities day-plan)))))
 
 (defn pauses
   "Given a day plan it returns a vector of pauses objects,
@@ -51,40 +60,37 @@
         p))))
 
 (defn daily-distance
-  "Given a plan, it returns a vector of structures containing how many
+      "Given a plan, it returns a vector of structures containing how many
   kilometers are done in each day, and from what kilometer each day starts"
-  [plan]
-  (let [default-average-speed 20
-        default-daily-plans [{:date (str (tick/today))
-                              :label "_day0"
-                              :activities [{:start "05:00"
-                                            :type :ride
-                                            :length (/ (gpx/total-distance
-                                                        (:gpx plan))
-                                                       default-average-speed)}]}]
-        daily-plans (or (:daily-plans plan)
-                        ;; If the user provided no plan, then a ficticious one
-                        ;; is used just for the sake of the calculations
-                        default-daily-plans)
-        elevation (gpx/elevation (:gpx plan))]
-    (loop [result []
-           acc-km 0
-           i 0]
-      (if (< i (count daily-plans))
-        (let [km (kilometers-in-a-day (nth daily-plans i)
-                                      (or (:average-speed plan)
-                                          default-average-speed))]
-          (recur (conj result
-                       {:day (+ 1 i)
-                        :label (:label (nth daily-plans i))
-                        :kilometers km
-                        :covered acc-km
-                        :elevation (gpx/elevation-gain elevation
-                                                       acc-km
-                                                       (+ km acc-km))})
-                 (+ acc-km km)
-                 (inc i)))
-        result))))
+      [plan]
+      (let [default-daily-plans [{:date (str (tick/today))
+                                        :label "_day0"
+                                        :activities [{:start "05:00"
+                                                             :type :ride
+                                                             :length (/ (gpx/total-distance
+                                                                         (:gpx plan))
+                                                                        default-average-speed)}]}]
+                                daily-plans (or (:daily-plans plan)
+                                                ;; If the user provided no plan, then a ficticious one
+                                                ;; is used just for the sake of the calculations
+                                                default-daily-plans)
+                                elevation (gpx/elevation (:gpx plan))]
+        (loop [result []
+                      acc-km 0
+                      i 0]
+              (if (< i (count daily-plans))
+                  (let [km (kilometers-in-a-day (average-speed (nth daily-plans i) plan))]
+                    (recur (conj result
+                                 {:day (+ 1 i)
+                                       :label (:label (nth daily-plans i))
+                                       :kilometers km
+                                       :covered acc-km
+                                       :elevation (gpx/elevation-gain elevation
+                                                                      acc-km
+                                                                      (+ km acc-km))})
+                           (+ acc-km km)
+                           (inc i)))
+                result))))
 
 (defn group-points-by-day [plan]
   (let [points-with-cumulative-distance (gpx/with-cumulative-distance

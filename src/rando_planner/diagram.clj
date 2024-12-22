@@ -286,7 +286,7 @@
 
 (defn day-plan->svg [plan index km center]
   (let [day-plan (nth (:daily-plans plan) index)
-        average-speed (:average-speed plan)
+        average-speed (average-speed day-plan plan)
         elevation (gpx/elevation (:gpx plan))
         pauses (plan/pauses day-plan)
         main-offset (* (/ km average-speed) box-size)
