@@ -79,10 +79,13 @@
            acc-km 0
            i 0]
       (if (< i (count daily-plans))
-        (let [km (kilometers-in-a-day (average-speed (nth daily-plans i) plan))]
+        (let [daily-plan (nth daily-plans i)
+              average-speed (average-speed daily-plan plan)
+              km (kilometers-in-a-day (nth daily-plans i) average-speed)]
           (recur (conj result
                        {:day (+ 1 i)
                         :label (:label (nth daily-plans i))
+                        :average-speed average-speed
                         :kilometers km
                         :covered acc-km
                         :elevation (gpx/elevation-gain elevation
@@ -110,6 +113,7 @@
 
   :day
   :cumulative-distance
+  :average-speed
   :elevation
   :ele
   :label
@@ -124,11 +128,11 @@
                                             gpx/with-cumulative-distance)
         daily-distance (daily-distance plan)
         points-at-end-of-days (for [dk daily-distance]
-                                (first (filter (fn [p]
-                                                 (> (:cumulative-distance p)
-                                                    (+ (:covered dk)
-                                                       (:kilometers dk))))
-                                               points-with-cumulative-distance)))
+                                   (first (filter (fn [p]
+                                                      (> (:cumulative-distance p)
+                                                         (+ (:covered dk)
+                                                            (:kilometers dk))))
+                                                  points-with-cumulative-distance)))
         daily-pauses (vec (map
                            (fn [pauses]
                              {:pauses pauses})

@@ -167,7 +167,7 @@
               (for [p (:pauses d)]
                 (let [{px :x} (pointspace-to-viewbox-space
                                {:x (+ (:covered d)
-                                      (* average-speed
+                                      (* (:average-speed d)
                                          (- (:after p)
                                             (:cumulative-pause p))))
                                 :y 0  ; not important, not used
