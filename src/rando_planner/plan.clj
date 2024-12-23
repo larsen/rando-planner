@@ -13,6 +13,15 @@
   (tick/>> (tick/time start)
            (tick/new-duration n :hours)))
 
+(def default-average-speed 18)
+
+(defn average-speed
+  ([day-plan] (or (:average-speed day-plan)
+                  default-average-speed))
+  ([day-plan plan] (or (:average-speed day-plan)
+                       (:average-speed plan)
+                       default-average-speed)))
+
 (defn kilometers-in-a-day [day-plan average-speed]
   (reduce + (map #(* (:length %) average-speed)
                  (filter #(= (:type %) :ride)
@@ -54,8 +63,7 @@
   "Given a plan, it returns a vector of structures containing how many
   kilometers are done in each day, and from what kilometer each day starts"
   [plan]
-  (let [default-average-speed 20
-        default-daily-plans [{:date (str (tick/today))
+  (let [default-daily-plans [{:date (str (tick/today))
                               :label "_day0"
                               :activities [{:start "05:00"
                                             :type :ride
@@ -71,12 +79,13 @@
            acc-km 0
            i 0]
       (if (< i (count daily-plans))
-        (let [km (kilometers-in-a-day (nth daily-plans i)
-                                      (or (:average-speed plan)
-                                          default-average-speed))]
+        (let [daily-plan (nth daily-plans i)
+              average-speed (average-speed daily-plan plan)
+              km (kilometers-in-a-day daily-plan average-speed)]
           (recur (conj result
                        {:day (+ 1 i)
                         :label (:label (nth daily-plans i))
+                        :average-speed average-speed
                         :kilometers km
                         :covered acc-km
                         :elevation (gpx/elevation-gain elevation
@@ -91,7 +100,7 @@
                                           (gpx/points (:gpx plan)))]
     (map (fn [d]
            (filter #(and (>= (:cumulative-distance %)
-                            (:covered d))
+                             (:covered d))
                          (< (:cumulative-distance %)
                             (+ (:covered d)
                                (:kilometers d))))
@@ -104,6 +113,7 @@
 
   :day
   :cumulative-distance
+  :average-speed
   :elevation
   :ele
   :label
@@ -118,11 +128,11 @@
                                             gpx/with-cumulative-distance)
         daily-distance (daily-distance plan)
         points-at-end-of-days (for [dk daily-distance]
-                                (first (filter (fn [p]
-                                                 (> (:cumulative-distance p)
-                                                    (+ (:covered dk)
-                                                       (:kilometers dk))))
-                                               points-with-cumulative-distance)))
+                                   (first (filter (fn [p]
+                                                      (> (:cumulative-distance p)
+                                                         (+ (:covered dk)
+                                                            (:kilometers dk))))
+                                                  points-with-cumulative-distance)))
         daily-pauses (vec (map
                            (fn [pauses]
                              {:pauses pauses})

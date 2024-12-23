@@ -158,16 +158,23 @@
                     :dominant-baseline "hanging"
                     :fill (get-from-palette :elevation-legend-stroke)}
              (str "▲ " (Math/floor (:elevation d)) " m")]
+            [:text {:x (+ dx1 2)
+                    :y 39
+                    :font-family "Fira Sans"
+                    :font-size "60%"
+                    :dominant-baseline "hanging"
+                    :fill (get-from-palette :elevation-legend-stroke)}
+             (str "🚄 " (:average-speed d) " km/h")]
             [:rect {:x dx1
-                    :y 0
-                    :width dx2 :height bottom-right-y
-                    :fill (get-alternating-background!)
-                    :fill-opacity 0.4}]
+                       :y 0
+                       :width dx2 :height bottom-right-y
+                       :fill (get-alternating-background!)
+                       :fill-opacity 0.4}]
             (when (:pauses d)
               (for [p (:pauses d)]
                 (let [{px :x} (pointspace-to-viewbox-space
                                {:x (+ (:covered d)
-                                      (* average-speed
+                                      (* (:average-speed d)
                                          (- (:after p)
                                             (:cumulative-pause p))))
                                 :y 0  ; not important, not used
@@ -286,7 +293,7 @@
 
 (defn day-plan->svg [plan index km center]
   (let [day-plan (nth (:daily-plans plan) index)
-        average-speed (:average-speed plan)
+        average-speed (plan/average-speed day-plan plan)
         elevation (gpx/elevation (:gpx plan))
         pauses (plan/pauses day-plan)
         main-offset (* (/ km average-speed) box-size)
