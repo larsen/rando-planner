@@ -81,7 +81,7 @@
       (if (< i (count daily-plans))
         (let [daily-plan (nth daily-plans i)
               average-speed (average-speed daily-plan plan)
-              km (kilometers-in-a-day (nth daily-plans i) average-speed)]
+              km (kilometers-in-a-day daily-plan average-speed)]
           (recur (conj result
                        {:day (+ 1 i)
                         :label (:label (nth daily-plans i))
