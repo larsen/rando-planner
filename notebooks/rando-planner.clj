@@ -33,27 +33,29 @@
     (clerk/col
      (clerk/with-viewer diagram/plan-viewer example-plan)))))
 
-;; **rando-planner**:
 
-;; - allows users to break down the route with more control, providing
-;; visualization tools that help evaluating and comparing different
-;; plans
+;; When planning a long-distance bike ride, you face two main
+;; challenges: determining the route from point A to B, and organizing
+;; your journey—deciding how much distance to cover each day, when to
+;; take breaks, and where to refuel. Traditional route planners, such
+;; as Komoot, Strava, and Cycle.travel, primarily address the first
+;; challenge: designing the route.
 
-;; - assumes the user already has a GPX track defined (provided for
-;; example by the organizers of a bike event), and let the user plan
-;; the daily effort to a higher granularity.
+;; Komoot includes a tool for dividing the route into multiple days,
+;; but it simply distributes the distance evenly across
+;; them. Cycle.travel, on the other hand, allows users to break the
+;; route at specific points and even helps locate accommodations for
+;; overnight stays.
 
-;; - is based on Clerk, a notebook library for Clojure
+;; Rando-planner takes a different approach. It assumes you already
+;; have a GPX file of your route and focuses exclusively on the second
+;; challenge: planning your journey in detail.
 
-;; Traditional tools (such as Komoot, Strava, Cycle.travel, etc.)
-;; focus on planning the route itself. Komoot offers an extra tool to
-;; divide the route into multiple days, but they distribute distance
-;; uniformly across the days. Cycle.travel allows to break down the
-;; route at arbitrary points (and helps finding accomodation for the
-;; night).
+;; With rando-planner, users can divide the route into individual
+;; activities or daily plans. The tool provides visualization tools to
+;; assess daily effort with greater precision and compare various
+;; strategies for covering the distance effectively.
 
-;; rando-planner provides different types of visualization that can be
-;; used to study different strategies to cover the distance.
 
 ;; This page has been composed with Clerk and rando-planner
 
@@ -63,17 +65,18 @@
 
 ;; ## Features
 
-;; - Schematic visualization of the plan, that includes:
-;;   - running count of kilometers
-;;   - elevation
-;;   - scheduled pauses
-;;   - total amount of kilometers accumulated every day
-;;   - sunrise and sunset indicators (WIP)
-
-;; - Map visualization (based
-;;   on [Leaflet](https://github.com/Leaflet/Leaflet)) of the route,
-;;   with markers corresponding to the location reached after each day
-;;   is completed.
+;; - Schematic Visualization of the Plan
+;;   - Displays a comprehensive overview of your route, including:
+;;   - Running count of kilometers.
+;;   - Elevation profile.
+;;   - Scheduled pauses.
+;;   - Total distance accumulated daily.
+;;   - Sunrise and sunset indicators (currently a work in progress).
+;; - Daily Elevation Visualization
+;;   - Provides a focused view of the elevation profile for each day, helping you gauge the effort required for specific segments of the route.
+;; - Map Visualization
+;;   - Interactive mapping powered by Leaflet.
+;;   - Highlights the route with markers indicating the location reached at the end of each day.
 
 ;; ## Usage example
 
@@ -258,18 +261,24 @@ be morale-crushing."]])
 ;; - `:gpx`: This key refers to the location of a GPX (GPS Exchange
 ;;   Format) file
 
-;; - `:average-speed`: This key represents the average speed
-;;   maintained during the activities. The value associated with this
-;;   key is expected to be a numerical value denoting speed, expressed
-;;   as km/h
+;; - `:average-speed` [Optional]: When appears only at this level,
+;;   this key represents the average speed maintained during all the
+;;   activities. The value associated with this key is expected to be
+;;   a numerical value denoting speed, expressed as km/h.  If
+;;   `:average-speed` is used in a daily-plan (see below) then that
+;;   value overrides this option.
 
-;; - `:daily-plans`: This key holds a vector of daily plans. Each
-;;   daily plan is represented as a map containing information about
-;;   activities planned for a single day. Inside each element in the
-;;   vector:
+;; - `:daily-plans` [Optional]: This key holds a vector of daily
+;;   plans. If no daily-plans is provided, rando-planner will use a
+;;   default value (one single activity, long enough to cover the
+;;   entire distance). Each daily plan is represented as a map
+;;   containing information about activities planned for a single
+;;   day. Inside each element in the vector:
 
 ;;   - `:date`: This key denotes the date of the daily plan in the format "YYYY-MM-DD". It is used to compute the sun rise and set times.
 ;;   - `:label`: An arbitrary string, a label or description of the daily plan
+;;   - `:average-speed' [Optional]: The value associated with this key is expected to be
+;;       a numerical value denoting speed, expressed as km/h.
 ;;   - `:activities`: This key holds a vector of activities planned for the day. Each activity is represented as a map containing:
 ;;     - `:start`: This key denotes the starting time of an activity, in the format "HH:mm"
 ;;     - `:type`: This key specifies the type of activity. At the moment only the type "ride" is in use. This key is reserved for future uses
