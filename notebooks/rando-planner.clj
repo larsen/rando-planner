@@ -229,7 +229,7 @@ be morale-crushing."]])
 ;; end of the first day. Intermediate markers, when clicked, display a
 ;; popup that shows the label of the day that _ends_ there, and the
 ;; amount of kilometers planned for that day. With this information,
-;; you can use other tools to find accomodation or other services
+;; you can use other tools to find accommodation or other services
 ;; you're going to need on the road.
 
 ;; Here the new map, this time displayed taking advantage of all the
