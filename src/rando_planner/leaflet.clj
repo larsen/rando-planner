@@ -5,12 +5,18 @@
 
 (defn add-center-and-bounds [plan]
   (if (:gpx plan)
-    (let [points (gpx/points (:gpx plan))]
+    (let [points (gpx/points (:gpx plan))
+          grouped-by-day (plan/group-points-by-day plan)
+          points-to-focus-on (if (:focus-on plan)
+                               (get grouped-by-day (:focus-on plan))
+                               points)
+          center (gpx/center points-to-focus-on)
+          bounds (gpx/bounds points-to-focus-on)]
       (assoc plan
              :points points
-             :grouped-by-day (plan/group-points-by-day plan)
-             :center (gpx/center points)
-             :bounds (gpx/bounds points)))
+             :grouped-by-day (vals grouped-by-day)
+             :center center
+             :bounds bounds))
     plan))
 
 (defn add-plan-markers [plan]
