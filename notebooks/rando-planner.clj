@@ -239,6 +239,12 @@ be morale-crushing."]])
  {:nextjournal/width :full}
  (clerk/with-viewer leaflet/leaflet-gpx-viewer equally-split-plan-with-pauses))
 
+;; Additionally, you can focus the map on the portion of map
+;; corresponding to a single day
+
+(clerk/with-viewer leaflet/leaflet-gpx-viewer
+  (assoc equally-split-plan-with-pauses :focus-on "Second day"))
+
 ;; ## How plans are defined
 
 ;; Examining an example, we'll provide a more formal definition of
