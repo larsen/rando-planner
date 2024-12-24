@@ -57,7 +57,7 @@
 ;; strategies for covering the distance effectively.
 
 
-;; This page has been composed with Clerk and rando-planner
+;; This page was composed with Clerk and rando-planner
 
 ;; You can see the code for the project [on
 ;; github.com](https://github.com/larsen/rando-planner).
