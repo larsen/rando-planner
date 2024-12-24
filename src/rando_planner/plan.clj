@@ -98,14 +98,15 @@
 (defn group-points-by-day [plan]
   (let [points-with-cumulative-distance (gpx/with-cumulative-distance
                                           (gpx/points (:gpx plan)))]
-    (map (fn [d]
-           (filter #(and (>= (:cumulative-distance %)
-                             (:covered d))
-                         (< (:cumulative-distance %)
-                            (+ (:covered d)
-                               (:kilometers d))))
-                   points-with-cumulative-distance))
-         (daily-distance plan))))
+    (into {} (map (fn [d]
+                    [(:label d)
+                     (filter #(and (>= (:cumulative-distance %)
+                                       (:covered d))
+                                   (< (:cumulative-distance %)
+                                      (+ (:covered d)
+                                         (:kilometers d))))
+                             points-with-cumulative-distance)])
+                  (daily-distance plan)))))
 
 (defn daily-stats
   "Given a plan, it returns a list of dictionaries with info and
@@ -128,11 +129,11 @@
                                             gpx/with-cumulative-distance)
         daily-distance (daily-distance plan)
         points-at-end-of-days (for [dk daily-distance]
-                                   (first (filter (fn [p]
-                                                      (> (:cumulative-distance p)
-                                                         (+ (:covered dk)
-                                                            (:kilometers dk))))
-                                                  points-with-cumulative-distance)))
+                                (first (filter (fn [p]
+                                                 (> (:cumulative-distance p)
+                                                    (+ (:covered dk)
+                                                       (:kilometers dk))))
+                                               points-with-cumulative-distance)))
         daily-pauses (vec (map
                            (fn [pauses]
                              {:pauses pauses})

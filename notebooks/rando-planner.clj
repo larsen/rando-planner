@@ -57,7 +57,7 @@
 ;; strategies for covering the distance effectively.
 
 
-;; This page has been composed with Clerk and rando-planner
+;; This page was composed with Clerk and rando-planner
 
 ;; You can see the code for the project [on
 ;; github.com](https://github.com/larsen/rando-planner).
@@ -238,6 +238,12 @@ be morale-crushing."]])
 (merge
  {:nextjournal/width :full}
  (clerk/with-viewer leaflet/leaflet-gpx-viewer equally-split-plan-with-pauses))
+
+;; Additionally, you can focus the map on the portion of map
+;; corresponding to a single day
+
+(clerk/with-viewer leaflet/leaflet-gpx-viewer
+  (assoc equally-split-plan-with-pauses :focus-on "Second day"))
 
 ;; ## How plans are defined
 
