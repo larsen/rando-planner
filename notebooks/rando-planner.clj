@@ -1,5 +1,6 @@
 ^{:nextjournal.clerk/visibility {:code :hide}}
 (ns notebooks.rando-planner
+    {:nextjournal.clerk/toc true}
     (:require [rando-planner.gpx :as gpx]
               [rando-planner.plan :as plan]
               [rando-planner.diagram :as diagram]
@@ -7,12 +8,12 @@
               [nextjournal.clerk :as clerk]))
 
 
-;; #### Custom viewers for [Clerk](https://github.com/nextjournal/clerk) for planning multi-day bike routes
-
 ^{:nextjournal.clerk/visibility {:code :hide}}
 (clerk/image "rando-planner-index.png")
 
 ;; # [rando-planner](https://github.com/larsen/rando-planner) 🚲
+
+;; Custom viewers for [Clerk](https://github.com/nextjournal/clerk) for planning multi-day bike routes
 
 ^{:nextjournal.clerk/visibility {:code :hide}}
 (let [example-plan {:gpx "gpx/be-rostock.gpx"
@@ -27,11 +28,9 @@
                                                 {:start "16:00" :type :ride :length 2.5}]}]}]
   (merge
    {:nextjournal/width :full}
-   (clerk/row
-    (clerk/col
-     (clerk/with-viewer diagram/elevation-viewer example-plan))
-    (clerk/col
-     (clerk/with-viewer diagram/plan-viewer example-plan)))))
+   (clerk/col
+    (clerk/with-viewer diagram/elevation-viewer example-plan)
+    (clerk/with-viewer diagram/plan-viewer example-plan))))
 
 
 ;; When planning a long-distance bike ride, you face two main
@@ -289,3 +288,17 @@ be morale-crushing."]])
 ;;     - `:start`: This key denotes the starting time of an activity, in the format "HH:mm"
 ;;     - `:type`: This key specifies the type of activity. At the moment only the type "ride" is in use. This key is reserved for future uses
 ;;     - `:length`: This key represents the duration or length of the activity, expressed in hours. It is expected to be a numerical value.
+
+;; ## Available visualizers
+
+;; ### Elevation viewer
+
+(clerk/with-viewer diagram/elevation-viewer equally-split-plan-with-pauses)
+
+;; ### Leaflet GPX viewer
+
+(clerk/with-viewer leaflet/leaflet-gpx-viewer equally-split-plan-with-pauses)
+
+;; ### Plan viewer
+
+(clerk/with-viewer diagram/plan-viewer equally-split-plan-with-pauses)
