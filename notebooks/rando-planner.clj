@@ -282,7 +282,8 @@ be morale-crushing."]])
 
 ;;   - `:date`: This key denotes the date of the daily plan in the format "YYYY-MM-DD". It is used to compute the sun rise and set times.
 ;;   - `:label`: An arbitrary string, a label or description of the daily plan
-;;   - `:average-speed' [Optional]: The value associated with this key is expected to be
+;;   - `:color` [Optional]: Color used to draw the portion of route corresponding to the daily plan. It is used only if you provide a color for each day in the daily plan
+;;   - `:average-speed` [Optional]: The value associated with this key is expected to be
 ;;       a numerical value denoting speed, expressed as km/h.
 ;;   - `:activities`: This key holds a vector of activities planned for the day. Each activity is represented as a map containing:
 ;;     - `:start`: This key denotes the starting time of an activity, in the format "HH:mm"
