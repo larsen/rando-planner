@@ -15,6 +15,7 @@
       (assoc plan
              :points points
              :grouped-by-day (vals grouped-by-day)
+             :point-groups-colors (remove nil? (map :color (:daily-plans plan)))
              :center center
              :bounds bounds))
     plan))
@@ -100,13 +101,19 @@
                                             (.setView @m (clj->js (:center value)) (:zoom value)))
                                           (.addTo tile-layer @m)
                                           (when (:points value)
-                                            (let [point-groups (:grouped-by-day value)]
-                                              (js/console.log (count point-groups))
+                                            (let [point-groups (:grouped-by-day value)
+                                                  point-groups-colors (:point-groups-colors value)]
+                                              (js/console.log "here!")
+                                              (js/console.log point-groups-colors)
                                               (doall
                                                (for [[pp color] (map vector
                                                                      point-groups
-                                                                     (take (count point-groups)
-                                                                           (cycle '["orange" "green" "red"])))]
+                                                                     (if (= (count point-groups)
+                                                                            (count point-groups-colors))
+                                                                       point-groups-colors
+                                                                       ;; If the user didn't provide a color for each segment
+                                                                       (take (count point-groups)
+                                                                             (cycle '["orange" "green" "red"]))))]
                                                  (.addTo (.polyline js/L (clj->js (map (fn [{lat :lat, lon :lon} p]
                                                                                          [lat lon])
                                                                                        pp))
