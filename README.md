@@ -33,7 +33,7 @@ Add `rando-planner` as a dependency in your project. For example:
 
 ```
 {:paths ["src"]
- :deps {org.clojure/clojure {:mvn/version "1.10.3"}
+ :deps {org.clojure/clojure {:mvn/version "1.12.0"}
         rando-planner/rando-planner {:git/url "https://github.com/larsen/rando-planner.git"
                                      :git/tag "tagname"
                                      :git/sha "xxxxxxxx"}}}
