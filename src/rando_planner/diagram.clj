@@ -10,7 +10,8 @@
                 (fn [include-fn]
                   (fn [state]
                     (concat (include-fn state)
-                            (list (hiccup.page/include-css "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"))))))
+                            (list (hiccup.page/include-css "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css")
+                                  (hiccup.page/include-css "https://unpkg.com/leaflet.fullscreen@3.0.2/Control.FullScreen.css"))))))
 
 (defn points->path
   "Turn a sequence of points into an SVG path string."

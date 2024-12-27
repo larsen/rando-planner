@@ -73,7 +73,8 @@
    :render-fn '(fn [value]
                  (when value
                    [nextjournal.clerk.render/with-d3-require
-                    {:package ["leaflet@1.7.1/dist/leaflet.min.js"]}
+                    {:package ["leaflet@1.7.1/dist/leaflet.min.js"
+                               "leaflet.fullscreen@3.0.2/Control.FullScreen.min.js"]}
                     (fn [leaflet]
                       (let [map-div-id (str (gensym))
                             m (atom nil)
@@ -95,7 +96,7 @@
                                                                              :iconAnchor [16, 45]}))
                                               tile-layer (.tileLayer js/L "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
                                                                      (clj->js {:attribution attribution}))]
-                                          (reset! m (.map js/L map-div-id))
+                                          (reset! m (.map js/L map-div-id (clj->js {:fullscreenControl true}) ))
                                           (if (:bounds value)
                                             (.fitBounds @m (clj->js (:bounds value)))
                                             (.setView @m (clj->js (:center value)) (:zoom value)))
