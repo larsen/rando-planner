@@ -24,18 +24,19 @@
   (if (and (:gpx plan)
            (:daily-plans plan))
     (assoc plan :markers
-           (map (fn [pp]
-                  (assoc pp :popup-message
-                         (str "<small>"
-                              "<strong>" (:label pp) "</strong>"
-                              "<br />"
-                              (Math/floor (:kilometers pp))
-                              " km / ("
-                              (Math/floor (:cumulative-distance pp))
-                              " km) ▲ "
-                              (Math/floor (:elevation pp))
-                              "</small>")))
-                (butlast (plan/daily-stats plan))))
+           (concat (:markers plan '())
+                   (map (fn [pp]
+                          (assoc pp :popup-message
+                                 (str "<small>"
+                                      "<strong>" (:label pp) "</strong>"
+                                      "<br />"
+                                      (Math/floor (:kilometers pp))
+                                      " km / ("
+                                      (Math/floor (:cumulative-distance pp))
+                                      " km) ▲ "
+                                      (Math/floor (:elevation pp))
+                                      "</small>")))
+                        (butlast (plan/daily-stats plan)))))
     plan))
 
 (defn add-km-markers [plan]
