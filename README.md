@@ -57,27 +57,29 @@ provided by rando-planner.
 ### Defining a plan
 
 ```clojure
-(def plan-start-19
-  {:description "Starting on April 19th"
-   :gpx "gpx/route.gpx"
-   :average-speed 20
-   :daily-plans [{:label "Day 1"
-                  :date "2024-04-19"
-                  :activities [{:start "15:00" :length 6 :type :ride}]}
-                 {:label "Day 2"
-                  :date "2024-04-20"
-                  :activities [{:start "07:00" :length 5 :type :ride}
-                               {:start "17:00" :length 3 :type :ride}]}
-                 {:label "Day 3"
-                  :date "2024-04-21"
-                  :activities [{:start "08:00" :length 6 :type :ride}]}]})
-```
+(def example-plan
+  {:gpx "gpx/be-rostock.gpx"
+   :daily-plans [{:date "2024-04-01"
+                  :label "First day"
+                  :average-speed 20
+                  :color "red"
+                  :activities [{:start "10:00" :type :ride :length 3}
+                               {:start "17:00" :type :ride :length 2}
+                               {:start "20:00" :type :ride :length 3}]}
+                 {:date "2024-04-02"
+                  :label "Second day"
+                  :average-speed 18
+                  :activities [{:start "10:00" :type :ride :length 4}
+                               {:start "16:00" :type :ride :length 2.5}]}]})
+ ```
 
 ### Usage examples
 
 The screenshots below were automatically generated using
-`plan-start-19`, as defined above.
+`example-plan`, as defined above.
 
 ![Example: plan diagram](rando-planner-example.png)
 
 ![Example: route with markers on a map](rando-planner-example-gpx.png)
+
+![Example: elevation diagram](rando-planner-example-elevation.png)
