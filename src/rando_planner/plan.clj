@@ -49,7 +49,7 @@
   [day-plan]
   (let [activities (:activities day-plan)
         plan-starts-at (tick/time (:start (first activities)))]
-    (loop [p []
+    (loop [result []
            cumulative-pause 0
            curr-activity (first activities)
            next-activities (rest activities)]
@@ -60,18 +60,18 @@
               pause-length (tick/between pause-start
                                          (tick/time
                                           (:start (first next-activities))))]
-          (recur (conj p {:start pause-start-as-str
-                          :after (tick/hours (tick/between plan-starts-at
-                                                           pause-start))
-                          ;; TODO
-                          ;; it should manage pauses that last
-                          ;; a fractional number of hours
-                          :length (tick/hours pause-length)
-                          :cumulative-pause cumulative-pause})
+          (recur (conj result {:start pause-start-as-str
+                               :after (tick/hours (tick/between plan-starts-at
+                                                                pause-start))
+                               ;; TODO
+                               ;; it should manage pauses that last
+                               ;; a fractional number of hours
+                               :length (tick/hours pause-length)
+                               :cumulative-pause cumulative-pause})
                  (+ cumulative-pause (tick/hours pause-length))
                  (first next-activities)
                  (rest next-activities)))
-        p))))
+        result))))
 
 (defn daily-plan [plan n]
   (nth (:daily-plans plan) n))
@@ -154,7 +154,7 @@
                                                    (:kilometers dk))))
                                      first))
         daily-pauses (vec (map #(assoc {} :pauses %)
-                           (map pauses (:daily-plans plan))))]
+                               (map pauses (:daily-plans plan))))]
     (map merge
          points-at-end-of-days
          daily-distance
