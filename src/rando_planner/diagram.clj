@@ -297,7 +297,10 @@
         average-speed (plan/average-speed day-plan plan)
         elevation (gpx/elevation (:gpx plan))
         pauses (plan/pauses day-plan)
-        main-offset (* (/ km average-speed) box-size)
+        main-offset (if (> index 0)
+                      (* (/ km (plan/average-speed
+                                (nth (:daily-plans plan) (- index 1)) plan)) box-size)
+                      0)
         total-km-for-day (plan/kilometers-in-a-day day-plan average-speed)]
     (into [:svg
            [:text {:x 0 :y 15
@@ -415,8 +418,7 @@
            (recur (inc index)
                   (+ total-kilometers-covered
                      (plan/kilometers-in-a-day daily-plan (plan/average-speed daily-plan plan)))
-                  (conj output [:g {:transform (str "translate(0 "
-                                                    (+ 50 (* index 50)) ")")}
+                  (conj output [:g {:transform (str "translate(0 " (+ 50 (* index 50)) ")")}
                                 (day-plan->svg plan index
                                                total-kilometers-covered
                                                center)])))
