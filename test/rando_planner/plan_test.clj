@@ -19,6 +19,20 @@
   (nth (:daily-plans example-plan) 0))
 
 (deftest plan-tests
+  (testing "daily-distance"
+    (is (= '[{:day 1,
+              :label "First day",
+              :average-speed 20,
+              :kilometers 160,
+              :covered 0,
+              :elevation 375.69999999999993}
+             {:day 2,
+              :label "Second day",
+              :average-speed 20,
+              :kilometers 140,
+              :covered 160,
+              :elevation 286.9000000000001}]
+           (plan/daily-distance example-plan))))
   (testing "Pauses"
     (is (= '([{:start "13:00", :after 3, :length 4 :cumulative-pause 0}
               {:start "19:00", :after 9, :length 1 :cumulative-pause 4}]
