@@ -22,6 +22,13 @@
                        (:average-speed plan)
                        default-average-speed)))
 
+(defn hourly-cumulative-distances-in-a-day [day-plan average-speed]
+  (->> (:activities day-plan)
+       (filter #(= (:type %) :ride))
+       (map #(take (:length %) (repeat average-speed)))
+       flatten
+       (reductions +)))
+
 (defn kilometers-in-a-day [day-plan average-speed]
   (reduce + (map #(* (:length %) average-speed)
                  (filter #(= (:type %) :ride)
