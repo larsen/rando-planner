@@ -399,9 +399,7 @@
                output))])))
 
 (defn plan-diagram [plan]
-  (let [total-distance (gpx/total-distance (:gpx plan))
-        center (gpx/center (gpx/points (:gpx plan)))
-        average-speed (:average-speed plan)]
+  (let [center (gpx/center (gpx/points (:gpx plan)))]
     [:svg {:width diagram-width
            :height diagram-height
            :viewBox "0 0 300 230"
@@ -413,15 +411,15 @@
             total-kilometers-covered 0
             output [:g]]
        (if (< index (count (:daily-plans plan)))
-         (recur (inc index)
-                (+ total-kilometers-covered
-                   (plan/kilometers-in-a-day (nth (:daily-plans plan) index)
-                                             average-speed))
-                (conj output [:g {:transform (str "translate(0 "
-                                                  (+ 50 (* index 50)) ")")}
-                              (day-plan->svg plan index
-                                             total-kilometers-covered
-                                             center)]))
+         (let [daily-plan (nth (:daily-plans plan) index)]
+           (recur (inc index)
+                  (+ total-kilometers-covered
+                     (plan/kilometers-in-a-day daily-plan (plan/average-speed daily-plan plan)))
+                  (conj output [:g {:transform (str "translate(0 "
+                                                    (+ 50 (* index 50)) ")")}
+                                (day-plan->svg plan index
+                                               total-kilometers-covered
+                                               center)])))
          output))]))
 
 (def plan-viewer
