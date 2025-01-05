@@ -148,14 +148,12 @@
                                             gpx/with-cumulative-distance)
         daily-distance (daily-distance plan)
         points-at-end-of-days (for [dk daily-distance]
-                                (first (filter (fn [p]
-                                                 (> (:cumulative-distance p)
-                                                    (+ (:covered dk)
-                                                       (:kilometers dk))))
-                                               points-with-cumulative-distance)))
-        daily-pauses (vec (map
-                           (fn [pauses]
-                             {:pauses pauses})
+                                (->> points-with-cumulative-distance
+                                     (filter #(> (:cumulative-distance %)
+                                                (+ (:covered dk)
+                                                   (:kilometers dk))))
+                                     first))
+        daily-pauses (vec (map #(assoc {} :pauses %)
                            (map pauses (:daily-plans plan))))]
     (map merge
          points-at-end-of-days

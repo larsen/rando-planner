@@ -33,6 +33,30 @@
               :covered 160,
               :elevation 286.9000000000001}]
            (plan/daily-distance example-plan))))
+  (testing "daily-stats"
+    (is (= '({:day 1,
+              :cumulative-distance 160.07331099360235,
+              :elevation 375.69999999999993,
+              :ele 79.4,
+              :average-speed 20,
+              :pauses
+              [{:cumulative-pause 0, :start "13:00", :after 3, :length 4}
+               {:cumulative-pause 4, :start "19:00", :after 9, :length 1}],
+              :label "First day",
+              :lon 12.42219,
+              :lat 53.50526,
+              :distance 0.08814470079957809,
+              :covered 0,
+              :kilometers 160}
+             {:day 2,
+              :elevation 286.9000000000001,
+              :average-speed 20,
+              :label "Second day",
+              :covered 160,
+              :kilometers 140,
+              :pauses
+              [{:cumulative-pause 0, :start "14:00", :after 4, :length 2}]})
+           (plan/daily-stats example-plan))))
   (testing "Pauses"
     (is (= '([{:start "13:00", :after 3, :length 4 :cumulative-pause 0}
               {:start "19:00", :after 9, :length 1 :cumulative-pause 4}]
