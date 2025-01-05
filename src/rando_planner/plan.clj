@@ -30,9 +30,10 @@
        (reductions +)))
 
 (defn kilometers-in-a-day [day-plan average-speed]
-  (reduce + (map #(* (:length %) average-speed)
-                 (filter #(= (:type %) :ride)
-                         (:activities day-plan)))))
+  (->> (:activities day-plan)
+       (filter #(= (:type %) :ride))
+       (map #(* (:length %) average-speed))
+       (reduce +)))
 
 (defn pauses
   "Given a day plan it returns a vector of pauses objects,
