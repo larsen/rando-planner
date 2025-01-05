@@ -366,36 +366,37 @@
            :font-size ".5em"}
     description]])
 
-(defn plan-main-kilometers-svg [total-distance average-speed]
-  (into [:svg]
-        [:g
-         (loop [i 0
-                output [:g]]
-           (if (< i (/ total-distance average-speed))
-             (recur (inc i)
-                    (conj output
-                          [:rect {:x (+ (* 5 box-size)
-                                        (* i box-size))
-                                  :y box-size
-                                  :width box-size :height box-size
-                                  :fill (get-from-palette :background)
-                                  :stroke "black"
-                                  :stroke-width 0.5}]))
-             output))
-         ;; Opaque box to create the illusion of ticks
-         [:rect {:x 0 :y 0 :width 400 :height 17 :fill (get-from-palette :background)}]
-         (loop [i 0
-                output [:g]]
-           (if (< i (/ total-distance average-speed))
-             (recur (inc i)
-                    (conj output
-                          [:text {:x (+ left-margin 5 (* i box-size))
-                                  :y 17
-                                  :font-family "Fira Sans"
-                                  :font-size ".25em"
-                                  :text-anchor "middle"}
-                           (str (* average-speed (+ 1 i)))]))
-             output))]))
+(defn plan-main-kilometers-svg [plan]
+  (let [hourly-distances (plan/hourly-cumulative-distances-in-a-plan plan)]
+    (into [:svg]
+          [:g
+           (loop [i 0
+                  output [:g]]
+             (if (< i (count hourly-distances))
+               (recur (inc i)
+                      (conj output
+                            [:rect {:x (+ (* 5 box-size)
+                                          (* i box-size))
+                                    :y box-size
+                                    :width box-size :height box-size
+                                    :fill (get-from-palette :background)
+                                    :stroke "black"
+                                    :stroke-width 0.5}]))
+               output))
+           ;; Opaque box to create the illusion of ticks
+           [:rect {:x 0 :y 0 :width 400 :height 17 :fill (get-from-palette :background)}]
+           (loop [i 0
+                  output [:g]]
+             (if (< i (count hourly-distances))
+               (recur (inc i)
+                      (conj output
+                            [:text {:x (+ left-margin 5 (* i box-size))
+                                    :y 17
+                                    :font-family "Fira Sans"
+                                    :font-size ".25em"
+                                    :text-anchor "middle"}
+                             (str (nth hourly-distances i))]))
+               output))])))
 
 (defn plan-diagram [plan]
   (let [total-distance (gpx/total-distance (:gpx plan))
@@ -407,8 +408,7 @@
            :style {:background-color (get-from-palette :background)}}
      (plan-title (:description plan))
      [:g {:transform "translate(0 25)"}
-      (plan-main-kilometers-svg total-distance
-                                average-speed)]
+      (plan-main-kilometers-svg plan)]
      (loop [index 0
             total-kilometers-covered 0
             output [:g]]
