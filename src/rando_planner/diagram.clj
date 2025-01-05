@@ -135,37 +135,16 @@
                          {:x (:kilometers d)
                           :y 0
                           :pointspace pointspace
-                          :viewbox viewbox})]
+                          :viewbox viewbox})
+               legend-text {:font-family "Fira Sans"
+                            :font-size "60%"
+                            :dominant-baseline "hanging"
+                            :fill (get-from-palette :elevation-legend-stroke)}]
            [:g
-            [:text {:x (+ dx1 2)
-                    :y 2
-                    :font-family "Fira Sans"
-                    :font-size "60%"
-                    :font-weight "bold"
-                    :dominant-baseline "hanging"
-                    :fill (get-from-palette :elevation-legend-stroke)}
-             (str (:label d))]
-            [:text {:x (+ dx1 2)
-                    :y 15
-                    :font-family "Fira Sans"
-                    :font-size "60%"
-                    :dominant-baseline "hanging"
-                    :fill (get-from-palette :elevation-legend-stroke)}
-             (str "↔ " (:kilometers d) " km")]
-            [:text {:x (+ dx1 2)
-                    :y 27
-                    :font-family "Fira Sans"
-                    :font-size "60%"
-                    :dominant-baseline "hanging"
-                    :fill (get-from-palette :elevation-legend-stroke)}
-             (str "▲ " (Math/floor (:elevation d)) " m")]
-            [:text {:x (+ dx1 2)
-                    :y 39
-                    :font-family "Fira Sans"
-                    :font-size "60%"
-                    :dominant-baseline "hanging"
-                    :fill (get-from-palette :elevation-legend-stroke)}
-             (str "🚄 " (:average-speed d) " km/h")]
+            [:text (assoc legend-text :x (+ dx1 2) :y 2 :font-weight "bold") (str (:label d))]
+            [:text (assoc legend-text :x (+ dx1 2) :y 15) (str "↔ " (:kilometers d) " km")]
+            [:text (assoc legend-text :x (+ dx1 2) :y 27) (str "▲ " (Math/floor (:elevation d)) " m")]
+            [:text (assoc legend-text :x (+ dx1 2) :y 39) (str "🚄 " (:average-speed d) " km/h")]
             [:rect {:x dx1
                        :y 0
                        :width dx2 :height bottom-right-y
