@@ -22,10 +22,24 @@
                        (:average-speed plan)
                        default-average-speed)))
 
+(defn hourly-distances-in-a-day [day-plan average-speed]
+  (->> (:activities day-plan)
+       (filter #(= (:type %) :ride))
+       (map #(take (:length %) (repeat average-speed)))
+       flatten))
+
+(defn hourly-cumulative-distances-in-a-day [day-plan average-speed]
+  (reductions + (hourly-distances-in-a-day day-plan average-speed)))
+
+(defn hourly-cumulative-distances-in-a-plan [plan]
+  (->> plan
+       :daily-plans
+       (map #(hourly-distances-in-a-day % (average-speed % plan)))
+       flatten
+       (reductions +)))
+
 (defn kilometers-in-a-day [day-plan average-speed]
-  (reduce + (map #(* (:length %) average-speed)
-                 (filter #(= (:type %) :ride)
-                         (:activities day-plan)))))
+  (reduce + (hourly-distances-in-a-day day-plan average-speed)))
 
 (defn pauses
   "Given a day plan it returns a vector of pauses objects,

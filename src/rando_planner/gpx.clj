@@ -98,12 +98,15 @@
                  (map :elevation-gain))))
 
 ;; TODO it is not clear this function returns a list of points
-(defn elevation [gpx-resource]
+
+(defn %elevation [gpx-resource]
   (-> gpx-resource
       points
       with-cumulative-distance
       group-by-kilometer
       with-elevation-gain))
+
+(def elevation (memoize %elevation))
 
 (defn total-distance [gpx-resource]
   (->> (points gpx-resource)
