@@ -73,32 +73,37 @@
                  (rest next-activities)))
         p))))
 
+(defn daily-plan [plan n]
+  (nth (:daily-plans plan) n))
+
+(defn default-daily-plans [plan]
+  [{:date (str (tick/today))
+    :label "_day0"
+    :activities [{:start "05:00"
+                  :type :ride
+                  :length (/ (gpx/total-distance
+                              (:gpx plan))
+                             default-average-speed)}]}])
+
 (defn daily-distance
   "Given a plan, it returns a vector of structures containing how many
   kilometers are done in each day, and from what kilometer each day starts"
   [plan]
-  (let [default-daily-plans [{:date (str (tick/today))
-                              :label "_day0"
-                              :activities [{:start "05:00"
-                                            :type :ride
-                                            :length (/ (gpx/total-distance
-                                                        (:gpx plan))
-                                                       default-average-speed)}]}]
-        daily-plans (or (:daily-plans plan)
+  (let [daily-plans (or (:daily-plans plan)
                         ;; If the user provided no plan, then a ficticious one
                         ;; is used just for the sake of the calculations
-                        default-daily-plans)
+                        (default-daily-plans plan))
         elevation (gpx/elevation (:gpx plan))]
     (loop [result []
            acc-km 0
            i 0]
       (if (< i (count daily-plans))
-        (let [daily-plan (nth daily-plans i)
-              average-speed (average-speed daily-plan plan)
-              km (kilometers-in-a-day daily-plan average-speed)]
+        (let [dp (daily-plan plan i)
+              average-speed (average-speed dp plan)
+              km (kilometers-in-a-day dp average-speed)]
           (recur (conj result
                        {:day (+ 1 i)
-                        :label (:label (nth daily-plans i))
+                        :label (:label dp)
                         :average-speed average-speed
                         :kilometers km
                         :covered acc-km

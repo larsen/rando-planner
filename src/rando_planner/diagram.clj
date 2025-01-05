@@ -272,13 +272,13 @@
           (str (+ kilometers (* average-speed (+ 1 n))))]]))))
 
 (defn day-plan->svg [plan index km center]
-  (let [day-plan (nth (:daily-plans plan) index)
+  (let [day-plan (plan/daily-plan plan index)
         average-speed (plan/average-speed day-plan plan)
         elevation (gpx/elevation (:gpx plan))
         pauses (plan/pauses day-plan)
         main-offset (if (> index 0)
                       (* (/ km (plan/average-speed
-                                (nth (:daily-plans plan) (- index 1)) plan)) box-size)
+                                (plan/daily-plan plan (- index 1)) plan)) box-size)
                       0)
         total-km-for-day (plan/kilometers-in-a-day day-plan average-speed)]
     (into [:svg
@@ -393,10 +393,10 @@
             total-kilometers-covered 0
             output [:g]]
        (if (< index (count (:daily-plans plan)))
-         (let [daily-plan (nth (:daily-plans plan) index)]
+         (let [dp (plan/daily-plan plan index)]
            (recur (inc index)
                   (+ total-kilometers-covered
-                     (plan/kilometers-in-a-day daily-plan (plan/average-speed daily-plan plan)))
+                     (plan/kilometers-in-a-day dp (plan/average-speed dp plan)))
                   (conj output [:g {:transform (str "translate(0 " (+ 50 (* index 50)) ")")}
                                 (day-plan->svg plan index
                                                total-kilometers-covered
