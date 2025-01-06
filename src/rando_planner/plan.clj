@@ -41,37 +41,40 @@
 (defn kilometers-in-a-day [day-plan average-speed]
   (reduce + (hourly-distances-in-a-day day-plan average-speed)))
 
+(defn %pauses [day-plan]
+  (let [activities (:activities day-plan)
+        plan-starts-at (tick/time (:start (first activities)))]
+    (->> activities
+         (partition 2 1)
+         (map (fn [[curr next]]
+                (let [pause-start (time-after-n-hours (tick/time (:start curr)) (:length curr))
+                      pause-length (tick/between pause-start (tick/time (:start next)))]
+                  {:start (str pause-start)
+                   :after (tick/hours (tick/between plan-starts-at pause-start))
+                   :length (tick/hours pause-length)})))
+         vec)))
+
+(defn add-cumulative-pause
+  "Adds the :cumulative-pause key to each map in the input vector,
+  representing the cumulative time spent in pauses up to (but not including) the current pause."
+  [pauses]
+  (first
+   (reduce
+    (fn [[result cumulative-pause] pause]
+      (let [updated-pause (assoc pause :cumulative-pause cumulative-pause)]
+        [(conj result updated-pause) (+ cumulative-pause (:length pause))]))
+    [[] 0] ; Initial result vector and cumulative pause
+    pauses)))
+
 (defn pauses
   "Given a day plan it returns a vector of pauses objects,
   each one characterized by its LENGTH (in hours),
   when it starts (as a string representing a time of the day),
   and how many hours after the start of the day the pause occurs."
   [day-plan]
-  (let [activities (:activities day-plan)
-        plan-starts-at (tick/time (:start (first activities)))]
-    (loop [result []
-           cumulative-pause 0
-           curr-activity (first activities)
-           next-activities (rest activities)]
-      (if (first next-activities)
-        (let [pause-start (time-after-n-hours (tick/time (:start curr-activity))
-                                              (:length curr-activity))
-              pause-start-as-str (str pause-start)
-              pause-length (tick/between pause-start
-                                         (tick/time
-                                          (:start (first next-activities))))]
-          (recur (conj result {:start pause-start-as-str
-                               :after (tick/hours (tick/between plan-starts-at
-                                                                pause-start))
-                               ;; TODO
-                               ;; it should manage pauses that last
-                               ;; a fractional number of hours
-                               :length (tick/hours pause-length)
-                               :cumulative-pause cumulative-pause})
-                 (+ cumulative-pause (tick/hours pause-length))
-                 (first next-activities)
-                 (rest next-activities)))
-        result))))
+  (-> day-plan
+      %pauses
+      add-cumulative-pause))
 
 (defn daily-plan [plan n]
   (nth (:daily-plans plan) n))
